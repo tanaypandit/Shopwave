@@ -51,58 +51,58 @@ A full-stack e-commerce platform built with Java Spring Boot.
 
 ## Screenshots
 ## Landing Page
-![Landing Page](screenshots/landing.png)
+![Landing Page](Screenshots/landing.png)
 
 ## Customer Login
-![Customer Login](screenshots/customer_login.png)
+![Customer Login](Screenshots/customer_login.png)
 
 ## Home Page
-![Home Page](screenshots/home.png)
+![Home Page](Screenshots/home.png)
 
 ## New Arrivals
-![New Arrivals](screenshots/new_arrivals.png)
+![New Arrivals](Screenshots/new_arrivals.png)
 
 ## Product 
-![Product](screenshots/product_details.png)
+![Product](Screenshots/product_details.png)
 
 ## My Cart
-![My Cart](screenshots/my_cart.png)
+![My Cart](Screenshots/my_cart.png)
 
 ## Delivery Slot
-![Delivery Slot](screenshots/delivery_slot_window.png)
+![Delivery Slot](Screenshots/delivery_slot_window.png)
 
 ## Payment Methods
-![Payment Methods](screenshots/payment_method.png)
+![Payment Methods](Screenshots/payment_method.png)
 
 ## Checkout
-![Checkout](screenshots/checkout_order_review.png)
+![Checkout](Screenshots/checkout_order_review.png)
 
 ## Bill/Invoice
-![Bill/Invoice](screenshots/order_bill.png)
+![Bill/Invoice](Screenshots/order_bill.png)
 
 ## Track Order
-![Track Order](screenshots/order_track.png)
+![Track Order](Screenshots/order_track.png)
 
 ## Admin Login
-![Admin Login](screenshots/admin_login.png)
+![Admin Login](Screenshots/admin_login.png)
 
 ## Admin Dashboard
-![Admin Dashboard](screenshots/admin_dashboard.png)
+![Admin Dashboard](Screenshots/admin_dashboard.png)
 
 ## Category Management
-![Category Management](screenshots/category_management.png)
+![Category Management](Screenshots/category_management.png)
 
 ## Product Management
-![Product Management](screenshots/product_management.png)
+![Product Management](Screenshots/product_management.png)
 
 ## View Orders
-![View Orders](screenshots/orders.png)
+![View Orders](Screenshots/orders.png)
 
 ## Assign Delivery
-![Assign Delivery](screenshots/Assign_Delivery.png)
+![Assign Delivery](Screenshots/Assign_Delivery.png)
 
 ## Delivery Login
-![Delivery Login](screenshots/delivery_login.png)
+![Delivery Login](Screenshots/delivery_login.png)
 
 ## Delivery Details
-![Delivery Details](screenshots/delivery_orders.png)
+![Delivery Details](Screenshots/delivery_orders.png)
