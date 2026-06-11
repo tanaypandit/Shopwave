@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ShopWave — Discover What You Love</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">🔥 New Arrivals Just Dropped</div>
+        <h1>Discover What<br/><span class="accent">You Love.</span></h1>
+        <p>Explore thousands of products across every category — from electronics to fashion, all at unbeatable prices.</p>
+        <div class="hero-actions">
+            <a th:href="@{/shop}" class="btn-primary btn-lg">Shop Now <i class="fas fa-arrow-right"></i></a>
+            <a th:href="@{/shop(sort=newest)}" class="btn-ghost">New Arrivals</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat"><strong>50K+</strong><span>Products</span></div>
+            <div class="stat"><strong>4.8★</strong><span>Avg Rating</span></div>
+            <div class="stat"><strong>Free</strong><span>Shipping ₹500+</span></div>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="hero-card floating">
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300" alt="Product"/>
+            <div class="hero-card-info">
+                <span>Trending Now</span>
+                <strong>Pro Headphones</strong>
+            </div>
+        </div>
+        <div class="hero-blob"></div>
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Shop by Category</h2>
+            <a th:href="@{/shop}" class="see-all">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="categories-grid">
+            <a th:each="cat : ${categories}"
+               th:href="@{/shop(categoryId=${cat.id})}"
+               class="category-card">
+                <div class="category-img">
+                    <img th:src="${cat.imageUrl}" th:alt="${cat.name}" onerror="this.src='https://via.placeholder.com/300x200'"/>
+                </div>
+                <div class="category-info">
+                    <h3 th:text="${cat.name}">Category</h3>
+                    <span th:text="${cat.description}">Desc</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- NEW ARRIVALS -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header">
+            <h2>New Arrivals</h2>
+            <a th:href="@{/shop(sort=newest)}" class="see-all">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="products-grid">
+            <div th:each="product : ${newArrivals}" class="product-card">
+                <a th:href="@{/product/{id}(id=${product.id})}" class="product-img-wrap">
+                    <img th:src="${product.imageUrl}" th:alt="${product.name}"
+                         onerror="this.src='https://via.placeholder.com/300x300'"/>
+                    <div class="product-badge" th:if="${product.stockQuantity < 10 and product.stockQuantity > 0}">Low Stock</div>
+                    <div class="product-badge sold-out" th:unless="${product.inStock}">Sold Out</div>
+                </a>
+                <div class="product-info">
+                    <span class="product-brand" th:text="${product.brand}">Brand</span>
+                    <h3><a th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Name</a></h3>
+                    <div class="product-rating">
+                        <span class="stars" th:data-rating="${product.rating}">★★★★★</span>
+                        <span th:text="'(' + ${product.reviewCount} + ')'"></span>
+                    </div>
+                    <div class="product-footer">
+                        <strong class="price" th:text="'₹' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+						<th:block th:if="${product.inStock}" sec:authorize="hasRole('CUSTOMER')">
+						    <a th:if="${product.category != null
+						               and product.category.name == 'Fashion'}"
+						       th:href="@{/product/{id}(id=${product.id})}"
+						       class="btn-cart" title="Select size to add to cart">
+						        <i class="fas fa-cart-plus"></i>
+						    </a>
+						    <form th:unless="${product.category != null
+						                      and product.category.name == 'Fashion'}"
+						          th:action="@{/cart/add}" method="post">
+						        <input type="hidden" name="productId" th:value="${product.id}"/>
+						        <input type="hidden" name="quantity" value="1"/>
+						        <button type="submit" class="btn-cart">
+						            <i class="fas fa-cart-plus"></i>
+						        </button>
+						    </form>
+						</th:block>
+						<a th:href="@{/login}" class="btn-cart" sec:authorize="isAnonymous()">
+						    <i class="fas fa-cart-plus"></i>
+						</a>
+						</form>
+						
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROMO BANNER -->
+<section class="promo-banner">
+    <div class="container">
+		<div class="promo-grid">
+		    <div class="promo-card promo-1">
+		        <h3>Free Shipping</h3>
+		        <p>On all orders above ₹500</p>
+		        <a th:href="@{/shipping-policy}" class="btn-white">
+		            Learn More
+		        </a>
+		    </div>
+		    <div class="promo-card promo-2">
+		        <h3>Easy Returns</h3>
+		        <p>30-day hassle-free returns</p>
+		        <!-- ✅ Now redirects to returns page -->
+		        <a th:href="@{/returns}" class="btn-white">
+		            Return Policy
+		        </a>
+		    </div>
+		    <div class="promo-card promo-3">
+		        <h3>Secure Payments</h3>
+		        <p>100% secure transactions</p>
+		        <!-- ✅ Now redirects to FAQ payments section -->
+		        <a th:href="@{/faq#payments}" class="btn-white">
+		            Know More
+		        </a>
+		    </div>
+		</div>
+    </div>
+</section>
+
+<!-- TOP RATED -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Top Rated Products</h2>
+            <a th:href="@{/shop(sort=rating)}" class="see-all">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="products-grid">
+            <div th:each="product : ${topRated}" class="product-card">
+                <a th:href="@{/product/{id}(id=${product.id})}" class="product-img-wrap">
+                    <img th:src="${product.imageUrl}" th:alt="${product.name}"
+                         onerror="this.src='https://via.placeholder.com/300x300'"/>
+                </a>
+                <div class="product-info">
+                    <span class="product-brand" th:text="${product.brand}">Brand</span>
+                    <h3><a th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Name</a></h3>
+                    <div class="product-rating">
+                        <span class="stars" th:data-rating="${product.rating}">★★★★★</span>
+                        <span th:text="'(' + ${product.reviewCount} + ')'"></span>
+                    </div>
+                    <div class="product-footer">
+                        <strong class="price" th:text="'₹' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+						<th:block th:if="${product.inStock}" sec:authorize="hasRole('CUSTOMER')">
+						    <a th:if="${product.category != null
+						               and product.category.name == 'Fashion'}"
+						       th:href="@{/product/{id}(id=${product.id})}"
+						       class="btn-cart" title="Select size to add to cart">
+						        <i class="fas fa-cart-plus"></i>
+						    </a>
+						    <form th:unless="${product.category != null
+						                      and product.category.name == 'Fashion'}"
+						          th:action="@{/cart/add}" method="post">
+						        <input type="hidden" name="productId" th:value="${product.id}"/>
+						        <input type="hidden" name="quantity" value="1"/>
+						        <button type="submit" class="btn-cart">
+						            <i class="fas fa-cart-plus"></i>
+						        </button>
+						    </form>
+						</th:block>
+						<a th:href="@{/login}" class="btn-cart" sec:authorize="isAnonymous()">
+						    <i class="fas fa-cart-plus"></i>
+						</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

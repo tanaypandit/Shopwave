@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>Invoice | ShopWave</title>
+	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500;600&display=swap"
+		rel="stylesheet" />
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: 'DM Sans', sans-serif;
+			background: #f4f1ed;
+			color: #1a1814;
+			padding: 2rem;
+		}
+
+		.bill {
+			max-width: 720px;
+			margin: 0 auto;
+			background: #fff;
+			border-radius: 12px;
+			overflow: hidden;
+			box-shadow: 0 4px 24px rgba(0, 0, 0, .1);
+		}
+
+		.bill-header {
+			background: #1a1814;
+			color: #fff;
+			padding: 2rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+		}
+
+		.bill-logo {
+			font-family: 'Syne', sans-serif;
+			font-size: 1.8rem;
+			font-weight: 800;
+		}
+
+		.bill-logo span {
+			color: #e8521a;
+		}
+
+		.bill-title {
+			font-size: .8rem;
+			opacity: .6;
+			text-transform: uppercase;
+			letter-spacing: .15em;
+			margin-top: .25rem;
+		}
+
+		.bill-meta {
+			text-align: right;
+			font-size: .85rem;
+			opacity: .8;
+		}
+
+		.bill-meta strong {
+			display: block;
+			font-size: 1rem;
+			opacity: 1;
+		}
+
+		.bill-body {
+			padding: 2rem;
+		}
+
+		.bill-addresses {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 2rem;
+			margin-bottom: 2rem;
+			padding-bottom: 2rem;
+			border-bottom: 2px solid #f4f1ed;
+		}
+
+		.address-box h4 {
+			font-size: .75rem;
+			text-transform: uppercase;
+			letter-spacing: .1em;
+			color: #6b6560;
+			margin-bottom: .6rem;
+		}
+
+		.address-box p {
+			font-size: .9rem;
+			line-height: 1.6;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 1.5rem;
+		}
+
+		thead th {
+			background: #f4f1ed;
+			padding: .75rem 1rem;
+			text-align: left;
+			font-size: .8rem;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: #6b6560;
+		}
+
+		tbody td {
+			padding: .85rem 1rem;
+			border-bottom: 1px solid #f4f1ed;
+			font-size: .9rem;
+		}
+
+		tbody tr:last-child td {
+			border-bottom: none;
+		}
+
+		.totals {
+			margin-left: auto;
+			width: 280px;
+		}
+
+		.total-row {
+			display: flex;
+			justify-content: space-between;
+			padding: .4rem 0;
+			font-size: .9rem;
+			color: #6b6560;
+		}
+
+		.total-row.grand {
+			border-top: 2px solid #1a1814;
+			margin-top: .5rem;
+			padding-top: .75rem;
+			font-weight: 700;
+			font-size: 1.1rem;
+			color: #1a1814;
+		}
+
+		.bill-footer {
+			background: #f4f1ed;
+			padding: 1.5rem 2rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			font-size: .8rem;
+			color: #6b6560;
+		}
+
+		.paid-badge {
+			background: #dcfce7;
+			color: #166534;
+			padding: .35rem .9rem;
+			border-radius: 99px;
+			font-weight: 700;
+			font-size: .8rem;
+		}
+
+		.print-bar {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 1.5rem;
+			justify-content: center;
+		}
+
+		@media print {
+			body {
+				background: #fff;
+				padding: 0;
+			}
+
+			.print-bar {
+				display: none;
+			}
+
+			.bill {
+				box-shadow: none;
+				border-radius: 0;
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="print-bar">
+
+		<a th:href="@{/orders/{id}(id=${order.id})}" style="background:rgb(255, 92, 15); color:rgb(255, 255, 255); border:none;
+              border-radius:8px; padding:.7rem 1.5rem;
+              font-weight:600; cursor:pointer; font-size:.95rem;
+              text-decoration:none; display:flex;
+              align-items:center; gap:.5rem;">
+			Back to Order
+		</a>
+	</div>
+
+	<div class="bill">
+		<!-- Header -->
+		<div class="bill-header">
+			<div>
+				<div class="bill-logo">
+					Shop<span>Wave</span>
+				</div>
+				<div class="bill-title">Tax Invoice</div>
+				<div style="font-size:.8rem; opacity:.6; margin-top:.5rem;">
+					ShopWave HQ, 42 Tech Park,<br />
+					Pune, Maharashtra - 411001<br />
+					GSTIN: 27AADCS1234R1Z5
+				</div>
+			</div>
+			<div class="bill-meta">
+				<strong th:text="'INV-' + ${order.orderNumber}">
+				</strong>
+				Invoice Number<br /><br />
+				<strong th:text="${#temporals.format(order.createdAt,
+                             'dd MMM yyyy')}">
+				</strong>
+				Invoice Date<br /><br />
+				<span class="pay-badge"
+				      th:if="${order.status.name() == ' CANCELLED'}"
+				      th:text="' Cancelled'"
+				      th:classappend="' pay-cancelled'">
+				</span>
+
+				<span class="pay-badge"
+				      th:if="${order.status.name() != ' CANCELLED'}"
+				      th:text="${order.paymentMethod == 'COD' ? ' Pay on Delivery' : order.paymentStatus}"
+				      th:classappend="${order.paymentMethod == 'COD' ? 'pay-cod' :
+				                      (order.paymentStatus.name() == 'PAID' ? ' pay-paid' :
+				                      (order.paymentStatus.name() == 'FAILED' ? ' pay-failed' : 'pay-pending'))}">
+				</span>
+			</div>
+		</div>
+
+		<!-- Body -->
+		<div class="bill-body">
+
+			<!-- Addresses -->
+			<div class="bill-addresses">
+				<div class="address-box">
+					<h4>Bill From</h4>
+					<p>
+						<strong>ShopWave</strong><br />
+						42 Tech Park, Hinjewadi<br />
+						Pune, Maharashtra - 411001<br />
+						support@shopwave.com
+					</p>
+				</div>
+				<div class="address-box">
+					<h4>Bill To</h4>
+					<p>
+						<strong th:text="${order.shippingName}">
+						</strong><br />
+						<span th:text="${order.shippingAddress}">
+						</span><br />
+						<span th:text="${order.shippingCity + ', ' +
+                                   order.shippingState + ' - ' +
+                                   order.shippingZip}">
+						</span><br />
+						<span th:text="${order.shippingPhone}">
+						</span>
+					</p>
+				</div>
+			</div>
+
+			<!-- Order Details -->
+			<div style="display:flex; gap:2rem; margin-bottom:1.5rem;
+                    font-size:.85rem; color:#6b6560;">
+				<span>Order No:
+					<strong th:text="${order.orderNumber}" style="color:#1a1814;">
+					</strong>
+				</span>
+				<span>Payment:
+					<strong th:text="${order.paymentMethod}" style="color:#1a1814;">
+					</strong>
+				</span>
+				<span>Status:
+					<strong th:text="${order.status}" style="color:#1a1814;">
+					</strong>
+				</span>
+			</div>
+
+			<!-- Items Table -->
+			<table>
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Product</th>
+						<th>Brand</th>
+						<th style="text-align:center;">Unit Price</th>
+						<th style="text-align:center;">Qty</th>
+						<th style="text-align:right;">Subtotal</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="item,idx : ${order.orderItems}">
+						<td th:text="${idx.count}" style="color:#6b6560;"></td>
+						<td>
+							<strong th:text="${item.product.name}"></strong>
+							<!-- ✅ Show size on invoice -->
+							<span th:if="${item.selectedSize != null
+				                      and !#strings.isEmpty(item.selectedSize)}">
+								<br><strong> Size: <span th:text="${item.selectedSize}"></span>
+							</span>
+						</td>
+						<td ><strong th:text="${item.product.brand}" style="color:#6b6560;"></td>
+						<td style="text-align:center;" th:text="'₹' + ${#numbers.formatDecimal(
+				                 item.unitPrice,1,'COMMA',0,'POINT')}">
+						</td>
+						<td style="text-align:center;" th:text="${item.quantity}"></td>
+						<td style="text-align:right; font-weight:600;" th:text="'₹' + ${#numbers.formatDecimal(
+				                 item.subtotal,1,'COMMA',0,'POINT')}">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<!-- Totals -->
+			<div class="totals">
+				<div class="total-row">
+					<span>Subtotal</span>
+					<span th:text="'₹' + ${#numbers.formatDecimal(
+                      order.totalAmount.subtract(order.shippingCost),
+                      1,'COMMA',0,'POINT')}">
+					</span>
+				</div>
+				<div class="total-row">
+					<span>Shipping</span>
+					<span>
+						<span th:if="${order.shippingCost.compareTo(
+                          T(java.math.BigDecimal).ZERO) == 0}">
+							FREE
+						</span>
+						<span th:unless="${order.shippingCost.compareTo(
+                          T(java.math.BigDecimal).ZERO) == 0}" th:text="'₹' + ${#numbers.formatDecimal(
+                                   order.shippingCost,
+                                   1,'COMMA',0,'POINT')}">
+						</span>
+					</span>
+				</div>
+				<div class="total-row">
+					<span>GST (18%)</span>
+					<span>Included</span>
+				</div>
+				<div class="total-row grand">
+					<span>Grand Total</span>
+					<span th:text="'₹' + ${#numbers.formatDecimal(
+                      order.totalAmount,1,'COMMA',0,'POINT')}">
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<div class="bill-footer">
+			<div>
+				<strong>Thank you for shopping with ShopWave!</strong><br />
+				For queries: support@shopwave.com | +91 98765 43210
+			</div>
+			<div style="text-align:right;">
+				This is a computer-generated invoice.<br />
+				No signature required.
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

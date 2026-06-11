@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Delivery Dashboard | ShopWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/admin.css}"/>
+</head>
+<body style="background:#f0ede9; min-height:100vh; padding:2rem;">
+<div style="max-width:900px; margin:0 auto;">
+
+    <div style="display:flex; align-items:center;
+                justify-content:space-between; margin-bottom:2rem;">
+        <h1 style="font-family:'Syne',sans-serif;">
+            <i class="fas fa-truck"></i> Delivery Dashboard
+        </h1>
+        <a th:href="@{/}" style="color:#e8521a; font-weight:600;">
+            ← Back to Store
+        </a>
+    </div>
+
+    <!-- Flash messages -->
+    <div th:if="${success}" style="background:#f0fdf4; border:1px solid
+         #bbf7d0; color:#166534; padding:1rem; border-radius:8px;
+         margin-bottom:1rem;">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${success}"></span>
+    </div>
+	<!-- ✅ Show when no orders assigned to this partner -->
+	<div th:if="${orders.empty}"
+	     style="text-align:center; padding:4rem 2rem;
+	            background:#fff; border-radius:12px;
+	            border:1px solid #e8e4df; margin-top:2rem;">
+	    <i class="fas fa-box-open"
+	       style="font-size:3rem; color:#e8e4df;
+	              margin-bottom:1rem; display:block;"></i>
+	    <h3 style="color:#6b6560; margin-bottom:.5rem;">
+	        No orders assigned yet
+	    </h3>
+	    <p style="color:#6b6560; font-size:.9rem;">
+	        The admin will assign orders to you shortly.
+	        Check back later.
+	    </p>
+	</div>
+
+	<!-- Orders list — only shown when there are assignments -->
+	<div th:unless="${orders.empty}">
+	<div th:each="order : ${orders}"
+	         style="background:#fff; border-radius:12px;
+	                padding:1.5rem; margin-bottom:1.25rem;
+	                border:1px solid #e8e4df; box-shadow:0 2px 12px
+	                rgba(0,0,0,.07);">
+
+					<div style="display:flex; justify-content:space-between;
+					            align-items:flex-start; margin-bottom:1rem;">
+					    <div>
+					        <strong style="font-size:1.1rem;"
+					                th:text="'Order #' + ${order.orderNumber}">
+					        </strong>
+					        <div style="color:#6b6560; font-size:.85rem; margin-top:.25rem;"
+					             th:text="${#temporals.format(order.createdAt,
+					                       'dd MMM yyyy, hh:mm a')}">
+					        </div>
+					    </div>
+					    <div style="display:flex; align-items:center; gap:.75rem;">
+					        <span th:text="${order.status}"
+					              th:classappend="'status-' +
+					              ${order.status.name().toLowerCase()}"
+					              class="status-badge">
+					        </span>
+					        <!-- ✅ NEW — View Details button -->
+					        <a th:href="@{/delivery/orders/{id}(id=${order.id})}"
+					           style="background:#f4f1ed; color:#1a1814;
+					                  border:1px solid #e8e4df; border-radius:8px;
+					                  padding:.4rem .9rem; font-size:.82rem;
+					                  font-weight:600; text-decoration:none;
+					                  white-space:nowrap;">
+					            <i class="fas fa-eye"></i> View Details
+					        </a>
+					    </div>
+					</div>
+
+	        <!-- Customer & Address -->
+	        <div style="background:#f4f1ed; border-radius:8px;
+	                    padding:1rem; margin-bottom:1rem;
+	                    display:grid; grid-template-columns:1fr 1fr;
+	                    gap:1rem;">
+	            <div>
+	                <strong>Customer</strong>
+	                <p th:text="${order.shippingName}"
+	                   style="margin:.25rem 0 0;">
+	                </p>
+	                <p th:text="${order.shippingPhone}"
+	                   style="color:#6b6560; font-size:.85rem;">
+	                </p>
+	            </div>
+	            <div>
+	                <strong>Delivery Address</strong>
+	                <p th:text="${order.shippingAddress}"
+	                   style="margin:.25rem 0 0; font-size:.9rem;">
+	                </p>
+	                <p th:text="${order.shippingCity + ', ' +
+	                             order.shippingState + ' - ' +
+	                             order.shippingZip}"
+	                   style="color:#6b6560; font-size:.85rem;">
+	                </p>
+	            </div>
+	        </div>
+			
+			<div th:if="${order.deliverySlot != null
+			             and !#strings.isEmpty(order.deliverySlot)}"
+			     style="background:#fff0ea; border:1px solid #e8521a;
+			            border-radius:8px; padding:.85rem 1rem;
+			            margin-bottom:1rem; display:flex;
+			            align-items:center; gap:.75rem;">
+			    <i class="fas fa-clock" style="color:#e8521a; font-size:1.2rem;"></i>
+			    <div>
+			        <strong style="display:block; font-size:.9rem;">
+			            Customer's Preferred Slot
+			        </strong>
+			        <span th:text="${order.deliverySlot}"
+			              style="color:#6b6560; font-size:.85rem;">
+			        </span>
+			    </div>
+			</div>
+
+	        <!-- Items -->
+	        <div style="margin-bottom:1rem;">
+	            <strong>Items:</strong>
+	            <div th:each="item : ${order.orderItems}"
+	                 style="display:flex; align-items:center;
+	                        gap:.5rem; margin-top:.5rem;
+	                        font-size:.85rem; color:#6b6560;">
+	                <i class="fas fa-circle"
+	                   style="font-size:.4rem;"></i>
+	                <span th:text="${item.product.name +
+	                               ' x' + item.quantity}">
+	                </span>
+	            </div>
+	        </div>
+
+	        <!-- Update Status Form -->
+	        <form th:action="@{/delivery/orders/{id}/update(id=${order.id})}"
+	              method="post"
+	              style="display:flex; gap:.75rem;
+	                     align-items:flex-end; flex-wrap:wrap;
+	                     border-top:1px solid #e8e4df; padding-top:1rem;">
+
+	            <div style="display:flex; flex-direction:column; gap:.35rem;">
+	                <label style="font-size:.8rem; font-weight:600;">
+	                    Update Status
+	                </label>
+	                <select name="status"
+	                        style="border:1.5px solid #e8e4df;
+	                               border-radius:8px; padding:.55rem .9rem;
+	                               font-size:.9rem; outline:none;">
+	                    <option value="PROCESSING"
+	                            th:selected="${order.status.name()
+	                                         == 'PROCESSING'}">
+	                        Processing
+	                    </option>
+	                    <option value="SHIPPED"
+	                            th:selected="${order.status.name()
+	                                         == 'SHIPPED'}">
+	                        Shipped / Out for Delivery
+	                    </option>
+	                    <option value="DELIVERED"
+	                            th:selected="${order.status.name()
+	                                         == 'DELIVERED'}">
+	                        Delivered
+	                    </option>
+	                    <option value="CANCELLED"
+	                            th:selected="${order.status.name()
+	                                         == 'CANCELLED'}">
+	                        Cancelled
+	                    </option>
+	                </select>
+	            </div>
+
+	            <div style="display:flex; flex-direction:column;
+	                        gap:.35rem; flex:1;">
+	                <label style="font-size:.8rem; font-weight:600;">
+	                    Delivery Note (optional)
+	                </label>
+	                <input type="text" name="deliveryNote"
+	                       th:value="${order.deliveryNote}"
+	                       placeholder="e.g. Left at door, Called customer..."
+	                       style="border:1.5px solid #e8e4df;
+	                              border-radius:8px; padding:.55rem .9rem;
+	                              font-size:.9rem; outline:none;"/>
+	            </div>
+
+	            <button type="submit"
+	                    style="background:#e8521a; color:#fff;
+	                           border:none; border-radius:8px;
+	                           padding:.65rem 1.4rem; font-weight:600;
+	                           cursor:pointer; font-size:.9rem;
+	                           white-space:nowrap;">
+	                <i class="fas fa-check"></i> Update
+	            </button>
+	        </form>
+	    </div>
+	</div>
+	</div>
+
+    
+    
+   
+</body>
+</html>

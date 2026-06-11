@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Categories | Admin</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+	<link rel="stylesheet" th:href="@{/css/admin.css}" />
+</head>
+
+<body class="admin-body">
+	<div th:replace="~{fragments/admin-nav :: admin-nav}"></div>
+	<div th:if="${error}" style="background:#fef2f2; border:1px solid #fecaca;
+            color:#991b1b; padding:1rem 1.25rem;
+            border-radius:8px; margin-bottom:1rem;
+            display:flex; align-items:center; gap:.75rem;">
+		<i class="fas fa-exclamation-circle"></i>
+		<span th:text="${error}"></span>
+	</div>
+	<div class="admin-content">
+		<div th:replace="~{fragments/layout :: flash}"></div>
+		<div class="admin-page-header">
+			<h1>Categories</h1>
+		</div>
+
+		<div style="display:grid; grid-template-columns: 1fr 2fr; gap:2rem;">
+			<!-- Add Category Form -->
+			<div class="admin-card">
+				<h3>Add Category</h3>
+				<form th:action="@{/admin/categories/save}" method="post" th:object="${category}">
+					<input type="hidden" th:field="*{id}" />
+					<div class="form-group">
+						<label>Name *</label>
+						<input type="text" th:field="*{name}" required placeholder="Eg: Home & Living" />
+					</div>
+					<div class="form-group">
+						<label>Slug</label>
+						<input type="text" th:field="*{slug}" placeholder="Eg: home-living" />
+					</div>
+					<div class="form-group">
+						<label>Description</label>
+						<input type="text" th:field="*{description}" placeholder="Brief Description" />
+					</div>
+					<div class="form-group">
+						<label>Image URL</label>
+						<input type="text" th:field="*{imageUrl}" placeholder="https://..." /><br>
+					</div>
+					<button type="submit" class="btn-primary">Save Category</button>
+				</form>
+			</div>
+
+			<!-- Categories Table -->
+			<div class="admin-card">
+				<div class="admin-table-wrapper">
+					<table class="admin-table">
+						<thead>
+							<tr>
+								<th>Image</th>
+								<th>Name</th>
+								<th>Slug</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="cat : ${categories}">
+								<td><img th:src="${cat.imageUrl}" alt="Cat"
+										style="width:40px;height:40px;object-fit:cover;border-radius:6px;"
+										onerror="this.src='https://via.placeholder.com/40'" /></td>
+								<td th:text="${cat.name}">Name</td>
+								<td th:text="${cat.slug}">Slug</td>
+								<td>
+									<form th:action="@{/admin/categories/delete/{id}(id=${cat.id})}" method="post"
+										onsubmit="return confirm('Delete this category?')">
+										<button type="submit" class="btn-danger btn-sm"><i
+												class="fas fa-trash"></i></button>
+									</form>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

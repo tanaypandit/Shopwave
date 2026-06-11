@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Register | ShopWave</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="auth-page">
+<div class="auth-container">
+    <div class="auth-brand">
+        <a href="/" class="logo">Shop<span>Wave</span></a>
+        <h2>Create Account</h2>
+        <p>Join thousands of happy shoppers</p>
+    </div>
+
+    <div th:if="${error}" class="flash flash-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="@{/register}" method="post" th:object="${user}" class="auth-form">
+		<div class="form-group">
+				    <label><i class="fas fa-user-tag"></i> Register As</label>
+					   
+					    <select th:field="*{role}">
+					        <option value="CUSTOMER">CUSTOMER</option>
+					        <option value="DELIVERY">DELIVERY PARTNER</option>
+					        <!-- ⚠️ DO NOT expose ADMIN here -->
+					    </select>
+					</div>
+		<div class="form-group">
+            <label><i class="fas fa-user"></i> Your Name</label>
+            <input type="text" th:field="*{fullName}"/>
+            <span class="field-error" th:errors="*{fullName}"></span>
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-envelope"></i> Email Address</label>
+            <input type="email" th:field="*{email}"/>
+            <span class="field-error" th:errors="*{email}"></span>
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-phone"></i> Contact Number</label>
+			<input type="tel"
+			       th:field="*{phone}"
+			       pattern="[0-9]{10}"
+			       maxlength="10"
+			       required />
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-lock"></i> Password</label>
+            <input type="password" th:field="*{password}"/>
+            <span class="field-error" th:errors="*{password}"></span>
+        </div>
+		
+		
+        <button type="submit" class="btn-primary btn-block">Create Account</button>
+    </form>
+
+    <p class="auth-footer">Already have an account? <a th:href="@{/login}">Sign In</a></p>
+</div>
+</body>
+</html>

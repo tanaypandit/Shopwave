@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Returns & Refunds | ShopWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<div class="container" style="padding-top:2rem;
+     padding-bottom:4rem; max-width:800px;">
+
+    <h1 class="page-title">
+        <i class="fas fa-undo" style="color:#e8521a;"></i>
+        Returns & Refunds
+    </h1>
+
+    <!-- 30 Day Banner -->
+    <div style="background:linear-gradient(135deg,#e8521a,#c94210);
+                color:#fff; border-radius:12px; padding:2rem;
+                margin-bottom:2rem; text-align:center;">
+        <h2 style="font-size:2.5rem; margin-bottom:.25rem;">30 Days</h2>
+        <p style="opacity:.9; font-size:1.1rem;">
+            Hassle-free return window from date of delivery
+        </p>
+    </div>
+
+    <!-- Steps -->
+    <h3 style="margin-bottom:1.25rem;">How to Return</h3>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr);
+                gap:1.25rem; margin-bottom:2.5rem;">
+        <div style="background:#fff; border:1px solid #e8e4df;
+                    border-radius:12px; padding:1.5rem;
+                    text-align:center;">
+            <div style="width:50px; height:50px; background:#fff0ea;
+                        border-radius:50%; display:flex;
+                        align-items:center; justify-content:center;
+                        margin:0 auto 1rem; font-size:1.3rem;
+                        color:#e8521a;">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h4>1. Contact Us</h4>
+            <p style="font-size:.85rem; color:#6b6560; margin-top:.5rem;">
+                Email support@shopwave.com with your order number
+                and reason for return
+            </p>
+        </div>
+        <div style="background:#fff; border:1px solid #e8e4df;
+                    border-radius:12px; padding:1.5rem;
+                    text-align:center;">
+            <div style="width:50px; height:50px; background:#fff0ea;
+                        border-radius:50%; display:flex;
+                        align-items:center; justify-content:center;
+                        margin:0 auto 1rem; font-size:1.3rem;
+                        color:#e8521a;">
+                <i class="fas fa-box"></i>
+            </div>
+            <h4>2. Pack & Ship</h4>
+            <p style="font-size:.85rem; color:#6b6560; margin-top:.5rem;">
+                Pack the item securely in original packaging.
+                Our team will arrange pickup.
+            </p>
+        </div>
+        <div style="background:#fff; border:1px solid #e8e4df;
+                    border-radius:12px; padding:1.5rem;
+                    text-align:center;">
+            <div style="width:50px; height:50px; background:#fff0ea;
+                        border-radius:50%; display:flex;
+                        align-items:center; justify-content:center;
+                        margin:0 auto 1rem; font-size:1.3rem;
+                        color:#e8521a;">
+                <i class="fas fa-rupee-sign"></i>
+            </div>
+            <h4>3. Get Refund</h4>
+            <p style="font-size:.85rem; color:#6b6560; margin-top:.5rem;">
+                Refund processed within 5–7 business days
+                to original payment method
+            </p>
+        </div>
+    </div>
+
+    <!-- Policy Details -->
+    <div style="background:#fff; border:1px solid #e8e4df;
+                border-radius:12px; padding:2rem; margin-bottom:1.5rem;">
+        <h3 style="margin-bottom:1.25rem;">Return Policy Details</h3>
+        <div style="display:flex; flex-direction:column; gap:.75rem;
+                    color:#6b6560; line-height:1.7;">
+            <p>✅ Items must be returned within <strong>30 days</strong>
+               of delivery</p>
+            <p>✅ Products must be <strong>unused and undamaged</strong>
+               in original packaging</p>
+            <p>✅ Original invoice/receipt must be included</p>
+            <p>✅ Free pickup for defective or wrong items</p>
+            <p>❌ Perishables, digital products, and
+               customized items are non-returnable</p>
+            <p>❌ Items showing signs of use or missing tags
+               will not be accepted</p>
+        </div>
+    </div>
+
+    <div style="text-align:center; padding:1.5rem;
+                background:#f4f1ed; border-radius:12px;">
+        <p style="color:#6b6560; margin-bottom:1rem;">
+            Need help with a return?
+        </p>
+        <a href="/contact" class="btn-primary">
+            <i class="fas fa-headset"></i> Contact Support
+        </a>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

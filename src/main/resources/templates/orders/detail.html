@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Order Detail | ShopWave</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+
+<body>
+	<div th:replace="~{fragments/layout :: navbar}"></div>
+
+	<div class="container" style="padding-top:2rem; padding-bottom:3rem;">
+		<!-- ✅ Flash messages — success and error -->
+		<div th:if="${success}"
+		     style="background:#f0fdf4; border:1px solid #bbf7d0;
+		            color:#166534; padding:1.25rem 1.5rem;
+		            border-radius:10px; margin-bottom:1.5rem;
+		            display:flex; align-items:center; gap:.75rem;">
+		    <i class="fas fa-check-circle" style="font-size:1.3rem;"></i>
+		    <div>
+		        <strong style="display:block;" th:text="${success}"></strong>
+		        <span style="font-size:.85rem; opacity:.85;">
+		            Our team will review and contact you within 24 hours.
+		        </span>
+		    </div>
+		</div>
+
+		<div th:if="${error}"
+		     style="background:#fef2f2; border:1px solid #fecaca;
+		            color:#991b1b; padding:1.25rem 1.5rem;
+		            border-radius:10px; margin-bottom:1.5rem;
+		            display:flex; align-items:center; gap:.75rem;">
+		    <i class="fas fa-exclamation-circle" style="font-size:1.3rem;"></i>
+		    <span th:text="${error}"></span>
+		</div>
+
+		<!-- Success Banner — shown right after order placement -->
+		<div th:if="${param.success}" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+	            border: 1px solid #bbf7d0; border-radius: 12px;
+	            padding: 2rem; margin-bottom: 2rem;">
+
+			<div style="display:flex; align-items:center; gap:1rem;
+	                margin-bottom:1.5rem;">
+				<div style="width:56px; height:56px; background:#1a9e5c;
+	                    border-radius:50%; display:flex; align-items:center;
+	                    justify-content:center; flex-shrink:0;">
+					<i class="fas fa-check" style="color:#fff; font-size:1.4rem;"></i>
+				</div>
+				<div>
+					<h3 style="color:#166534; font-size:1.3rem; margin:0;">
+						Order Placed Successfully! 🎉
+					</h3>
+					<p style="color:#166534; opacity:.8; margin:.25rem 0 0;
+	                      font-size:.9rem;">
+						Thank you! We will start processing your order right away.
+					</p>
+				</div>
+			</div>
+
+			<!-- Estimated Delivery Date — BIG highlight -->
+			<div th:if="${order.estimatedDeliveryDate != null}" style="background:#fff; border-radius:10px;
+	                padding:1.25rem 1.5rem; border-left:4px solid #e8521a;
+	                display:flex; align-items:center;
+	                justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+				<div style="display:flex; align-items:center; gap:.75rem;">
+					<i class="fas fa-truck" style="color:#e8521a; font-size:1.5rem;"></i>
+					<div>
+						<span style="font-size:.8rem; color:#6b6560;
+	                             text-transform:uppercase;
+	                             letter-spacing:.08em; font-weight:600;">
+							Estimated Delivery
+						</span>
+						<strong th:text="${order.estimatedDeliveryDate}" style="display:block; font-size:1.15rem;
+	                               color:#1a1814; font-family:'Syne',sans-serif;">
+						</strong>
+					</div>
+				</div>
+				<div th:if="${order.deliverySlot != null
+	                     and !#strings.isEmpty(order.deliverySlot)}" style="display:flex; align-items:center; gap:.5rem;
+	                    background:#fff0ea; padding:.6rem 1rem;
+	                    border-radius:99px;">
+					<i class="fas fa-clock" style="color:#e8521a;"></i>
+					<span th:text="${order.deliverySlot}" style="font-size:.85rem; font-weight:600;
+	                         color:#e8521a;">
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="order-detail-layout">
+			<!-- Order Info -->
+			<div class="order-detail-main">
+				<div class="checkout-container">
+					<div class="checkout-card">
+						<div class="order-detail-header">
+							<div>
+								<h2 th:text="'Order #' + ${order.orderNumber}">Order</h2>
+								<span
+									th:text="${#temporals.format(order.createdAt, 'dd MMMM yyyy, hh:mm a')}">Date</span>
+							</div>
+							<span th:text="${order.status}" class="status-badge"
+								th:classappend="'status-' + ${order.status.name().toLowerCase()}">PENDING</span>
+						</div>
+						<!-- ✅ CANCEL — only for PENDING / CONFIRMED / PROCESSING -->
+						<div th:if="${order.status.name() == 'PENDING'
+				             or order.status.name() == 'CONFIRMED'
+				             or order.status.name() == 'PROCESSING'}" style="margin-bottom:1.25rem; padding:1.25rem;
+				            background:#fef2f2; border:1px solid #fecaca;
+				            border-radius:10px;">
+
+							<h4 style="color:#991b1b; margin-bottom:.75rem;">
+								<i class="fas fa-times-circle"></i> Cancel This Order
+							</h4>
+							<p style="font-size:.85rem; color:#6b6560; margin-bottom:.85rem;">
+								You can cancel this order before it is shipped.
+								Once dispatched, cancellation is not possible.
+							</p>
+
+							<form th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post">
+								<div style="margin-bottom:.6rem;">
+									<input type="text" name="reason" placeholder="Reason for cancellation (optional)"
+										style="width:100%; border:1.5px solid #fecaca;
+				                          border-radius:8px; padding:.6rem .85rem;
+				                          font-size:.9rem; outline:none;
+				                          box-sizing:border-box;" />
+								</div>
+								<button type="submit"
+									onclick="return confirm('Are you sure you want to cancel this order?')" style="background:#dc2626; color:#fff; border:none;
+				                       border-radius:8px; padding:.6rem 1.4rem;
+				                       font-weight:600; cursor:pointer;
+				                       font-size:.9rem;">
+									<i class="fas fa-times"></i> Cancel Order
+								</button>
+							</form>
+						</div>
+
+						<!-- ✅ RETURN / EXCHANGE — only after SHIPPED or DELIVERED -->
+						<div th:if="${order.status.name() == 'SHIPPED'
+				             or order.status.name() == 'DELIVERED'}" style="margin-bottom:1.25rem; padding:1.25rem;
+				            background:#fff0ea; border:1px solid #e8521a;
+				            border-radius:10px;">
+
+							<h4 style="color:#c94210; margin-bottom:.75rem;">
+								<i class="fas fa-exchange-alt"></i>
+								Return or Exchange
+							</h4>
+							<p style="font-size:.85rem; color:#6b6560; margin-bottom:.85rem;">
+								Not satisfied with your order? Request a return or exchange
+								within <strong>7 days</strong> of delivery.
+								Our team will contact you within 24 hours.
+							</p>
+
+							<form th:action="@{/orders/{id}/return-exchange(id=${order.id})}" method="post">
+								<!-- Type selection -->
+								<div style="display:flex; gap:.75rem; margin-bottom:.85rem;">
+									<label style="display:flex; align-items:center; gap:.4rem;
+				                          padding:.55rem 1rem; border:1.5px solid #e8521a;
+				                          border-radius:8px; cursor:pointer;
+				                          background:#fff; font-size:.88rem; font-weight:600;">
+										<input type="radio" name="type" value="RETURN" required
+											style="accent-color:#e8521a;" />
+										<i class="fas fa-undo" style="color:#e8521a;"></i>
+										Return
+									</label>
+									<label style="display:flex; align-items:center; gap:.4rem;
+				                          padding:.55rem 1rem; border:1.5px solid #e8521a;
+				                          border-radius:8px; cursor:pointer;
+				                          background:#fff; font-size:.88rem; font-weight:600;">
+										<input type="radio" name="type" value="EXCHANGE"
+											style="accent-color:#e8521a;" />
+										<i class="fas fa-sync-alt" style="color:#e8521a;"></i>
+										Exchange
+									</label>
+								</div>
+
+								<!-- Reason -->
+								<div style="margin-bottom:.75rem;">
+									<textarea name="reason" rows="2"
+										placeholder="Please describe your reason (e.g. wrong size, defective product, changed mind...)"
+										style="width:100%; border:1.5px solid #e8e4df;
+				                             border-radius:8px; padding:.6rem .85rem;
+				                             font-size:.88rem; outline:none; resize:vertical;
+				                             font-family:inherit; box-sizing:border-box;">
+				            </textarea>
+								</div>
+
+								<button type="submit" onclick="return confirm('Submit this request?')" style="background:#e8521a; color:#fff; border:none;
+				                       border-radius:8px; padding:.6rem 1.4rem;
+				                       font-weight:600; cursor:pointer; font-size:.9rem;">
+									<i class="fas fa-paper-plane"></i> Submit Request
+								</button>
+							</form>
+						</div>
+
+						<!-- ✅ ALREADY CANCELLED banner -->
+						<div th:if="${order.status.name() == 'CANCELLED'}" style="margin-bottom:1.25rem; padding:1rem 1.25rem;
+				            background:#fef2f2; border:1px solid #fecaca;
+				            border-radius:10px; display:flex;
+				            align-items:center; gap:.75rem;">
+							<i class="fas fa-times-circle" style="color:#dc2626; font-size:1.3rem;"></i>
+							<div>
+								<strong style="color:#991b1b; display:block;">
+									Order Cancelled
+								</strong>
+								<span style="font-size:.83rem; color:#6b6560;" th:text="${order.deliveryNote != null
+				                        ? order.deliveryNote : 'This order has been cancelled.'}">
+								</span>
+							</div>
+						</div>
+
+						<!-- ✅ RETURN REQUESTED banner -->
+						<div th:if="${order.status.name() == 'RETURN_REQUESTED'}" style="margin-bottom:1.25rem; padding:1rem 1.25rem;
+				            background:#fff0ea; border:1px solid #e8521a;
+				            border-radius:10px; display:flex;
+				            align-items:center; gap:.75rem;">
+							<i class="fas fa-undo" style="color:#e8521a; font-size:1.3rem;"></i>
+							<div>
+								<strong style="color:#c94210; display:block;">
+									Return Request Submitted
+								</strong>
+								<span style="font-size:.83rem; color:#6b6560;">
+									Our team will contact you within 24 hours.
+								</span>
+								<span th:if="${order.returnReason != null
+				                      and !#strings.isEmpty(order.returnReason)}" style="display:block; font-size:.82rem;
+				                     color:#6b6560; margin-top:.2rem;" th:text="'Reason: ' + ${order.returnReason}">
+								</span>
+							</div>
+						</div>
+
+						<!-- ✅ EXCHANGE REQUESTED banner -->
+						<div th:if="${order.status.name() == 'EXCHANGE_REQUESTED'}" style="margin-bottom:1.25rem; padding:1rem 1.25rem;
+				            background:#e6f1fb; border:1px solid #185fa5;
+				            border-radius:10px; display:flex;
+				            align-items:center; gap:.75rem;">
+							<i class="fas fa-sync-alt" style="color:#185fa5; font-size:1.3rem;"></i>
+							<div>
+								<strong style="color:#0c447c; display:block;">
+									Exchange Request Submitted
+								</strong>
+								<span style="font-size:.83rem; color:#6b6560;">
+									Our team will contact you within 24 hours.
+								</span>
+								<span th:if="${order.returnReason != null
+				                      and !#strings.isEmpty(order.returnReason)}" style="display:block; font-size:.82rem;
+				                     color:#6b6560; margin-top:.2rem;" th:text="'Reason: ' + ${order.returnReason}">
+								</span>
+							</div>
+						</div>
+
+						<!-- Order Items -->
+						<div class="order-items-table">
+							<div class="table-header">
+								<span>Product</span>
+								<span>Price</span>
+								<span>Qty</span>
+								<span>Subtotal</span>
+							</div>
+							<div th:each="item : ${order.orderItems}" class="table-row">
+								<div class="table-product">
+									<img th:src="${item.product.imageUrl}" th:alt="${item.product.name}"
+										onerror="this.src='https://via.placeholder.com/60x60'" />
+									<div>
+										<strong th:text="${item.product.name}">Name</strong>
+										<!-- ✅ Size on its own line — block display keeps columns aligned -->
+										<span th:if="${item.selectedSize != null
+						                      and !#strings.isEmpty(item.selectedSize)}" style="display:block; background:#fff0ea;
+						                     color:#e8521a; font-size:.72rem; font-weight:700;
+						                     padding:.1rem .5rem; border-radius:99px;
+						                     border:1px solid #e8521a;
+						                     width:fit-content; margin:.2rem 0;">
+											Size: <span th:text="${item.selectedSize}"></span>
+										</span>
+										<span th:text="${item.product.brand}">Brand</span>
+									</div>
+								</div>
+								<span th:text="'₹' + ${#numbers.formatDecimal(
+					          item.unitPrice, 1, 'COMMA', 0, 'POINT')}">Price</span>
+								<span th:text="${item.quantity}">1</span>
+								<span th:text="'₹' + ${#numbers.formatDecimal(
+					          item.subtotal, 1, 'COMMA', 0, 'POINT')}">₹0</span>
+							</div>
+
+							<!-- Totals -->
+							<div class="order-totals">
+								<div class="summary-row">
+									<span>Shipping</span>
+									<strong>
+										<span th:if="${order.shippingCost.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+											class="free">FREE</span>
+										<span
+											th:unless="${order.shippingCost.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+											th:text="'₹' + ${#numbers.formatDecimal(order.shippingCost, 1, 'COMMA', 0, 'POINT')}"></span>
+									</strong>
+								</div>
+								<div class="summary-row total">
+									<span>Grand Total</span>
+									<strong
+										th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Sidebar -->
+				<div class="order-detail-sidebar">
+					<!-- Estimated Delivery Card — always visible -->
+					<div class="checkout-card" th:if="${order.estimatedDeliveryDate != null}"
+						style="border-left: 4px solid #e8521a;">
+						<h3 style="margin-bottom:.75rem;">
+							<i class="fas fa-truck" style="color:#e8521a;"></i>
+							Estimated Delivery
+						</h3>
+						<p th:text="${order.estimatedDeliveryDate}" style="font-size:1.05rem; font-weight:700;
+			              color:#1a1814; margin-bottom:.5rem;
+			              font-family:'Syne',sans-serif;">
+						</p>
+						<div th:if="${order.deliverySlot != null
+			                 and !#strings.isEmpty(order.deliverySlot)}" style="display:flex; align-items:center; gap:.5rem;
+			                background:#fff0ea; padding:.5rem .85rem;
+			                border-radius:99px; width:fit-content;">
+							<i class="fas fa-clock" style="color:#e8521a; font-size:.85rem;"></i>
+							<span th:text="${order.deliverySlot}"
+								style="font-size:.8rem; font-weight:600; color:#e8521a;">
+							</span>
+						</div>
+						<p style="font-size:.78rem; color:#6b6560; margin-top:.6rem;">
+							<i class="fas fa-info-circle"></i>
+							Delivery attempts will be made during your chosen slot.
+						</p>
+					</div>
+					<!-- Shipping Address -->
+					<div class="checkout-card">
+						<h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
+						<div class="address-block">
+							<strong th:text="${order.shippingName}">Name</strong><br />
+							<span th:text="${order.shippingAddress}">Address</span><br />
+							<span
+								th:text="${order.shippingCity} + ', ' + ${order.shippingState} + ' - ' + ${order.shippingZip}">City</span><br />
+							<span><i class="fas fa-phone"></i> <span
+									th:text="${order.shippingPhone}">Phone</span></span>
+						</div>
+
+					</div>
+
+					<!-- Payment Info -->
+					<div class="checkout-card">
+						<h3><i class="fas fa-credit-card"></i> Payment</h3>
+						<p th:text="${order.paymentMethod}">Method</p>
+						<span class="pay-badge" th:if="${order.status.name() == 'CANCELLED'}" th:text="'Cancelled'"
+							th:classappend="'pay-cancelled'">
+						</span>
+
+						<span class="pay-badge" th:if="${order.status.name() != 'CANCELLED'}"
+							th:text="${order.paymentMethod == 'COD' ? 'Pay on Delivery' : order.paymentStatus}"
+							th:classappend="${order.paymentMethod == 'COD' ? 'pay-cod' :
+				                      (order.paymentStatus.name() == 'PAID' ? 'pay-paid' :
+				                      (order.paymentStatus.name() == 'FAILED' ? 'pay-failed' : 'pay-pending'))}">
+						</span>
+					</div>
+
+					<div class="checkout-card" th:if="${order.deliverySlot != null
+			     and !#strings.isEmpty(order.deliverySlot)}">
+						<h3><i class="fas fa-clock" style="color:#e8521a;"></i>
+							Delivery Slot</h3>
+						<div style="display:flex; align-items:center; gap:.75rem;
+			                padding:.75rem; background:#fff0ea;
+			                border-radius:8px; margin-top:.5rem;">
+							<i class="fas fa-truck" style="color:#e8521a; font-size:1.2rem;"></i>
+							<div>
+								<strong th:text="${order.deliverySlot}" style="display:block; color:#1a1814;">
+								</strong>
+								<span style="font-size:.8rem; color:#6b6560;">
+									Preferred delivery window
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<a th:href="@{/orders}" class="btn-outline btn-block">
+						<i class="fas fa-arrow-left"></i> Back to Orders
+					</a>
+					<a th:href="@{/shop}" class="btn-primary btn-block" style="margin-top:.5rem;">
+						Continue Shopping
+					</a>
+					<!-- Add inside order-detail-sidebar, below existing buttons -->
+					<a th:href="@{/orders/{id}/bill(id=${order.id})}" class="btn-outline btn-block"
+						style="margin-top:.5rem;" target="_blank">
+						<i class="fas fa-print"></i> Print Invoice
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<div th:replace="~{fragments/layout :: footer}"></div>
+		<script th:src="@{/js/main.js}"></script>
+</body>
+
+</html>

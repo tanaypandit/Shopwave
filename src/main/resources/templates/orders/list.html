@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Orders | ShopWave</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container" style="padding-top:2rem; padding-bottom:3rem;">
+    <h1 class="page-title">My Orders</h1>
+
+    <div th:if="${orders.empty}" class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <h3>No orders yet</h3>
+        <p>Start shopping and your orders will appear here.</p>
+        <a th:href="@{/shop}" class="btn-primary">Shop Now</a>
+    </div>
+
+    <div class="orders-list" th:unless="${orders.empty}">
+        <div th:each="order : ${orders}" class="order-card">
+            <div class="order-card-header">
+                <div>
+                    <strong th:text="'Order #' + ${order.orderNumber}">Order #</strong>
+                    <span th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy, hh:mm a')}">Date</span>
+                </div>
+                <div class="order-status-badges">
+                    <!--<span th:text="${order.status}" th:classappend="'status-' + ${order.status.name().toLowerCase()}" class="status-badge">PENDING</span>-->
+					<span class="pay-badge"
+					      th:if="${order.status.name() == 'CANCELLED'}"
+					      th:text="'Cancelled'"
+					      th:classappend="'pay-cancelled'">
+					</span>
+
+					<span class="pay-badge"
+					      th:if="${order.status.name() != 'CANCELLED'}"
+					      th:text="${order.paymentMethod == 'COD' ? 'Pay on Delivery' : order.paymentStatus}"
+					      th:classappend="${order.paymentMethod == 'COD' ? 'pay-cod' :
+					                      (order.paymentStatus.name() == 'PAID' ? 'pay-paid' :
+					                      (order.paymentStatus.name() == 'FAILED' ? 'pay-failed' : 'pay-pending'))}">
+					</span>
+                </div>
+            </div>
+            <div class="order-card-items">
+                <div th:each="item : ${order.orderItems}" class="order-item-mini">
+                    <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}"
+                         onerror="this.src='https://via.placeholder.com/50x50'"/>
+                    <span th:text="${item.product.name} + ' x' + ${item.quantity}">Product</span>
+                </div>
+            </div>
+            <div class="order-card-footer">
+                <strong th:text="'Total: ₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+                <a th:href="@{/orders/{id}(id=${order.id})}" class="btn-outline">View Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>My Cart | ShopWave</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+
+<body>
+	<div th:replace="~{fragments/layout :: navbar}"></div>
+	<div th:replace="~{fragments/layout :: flash}"></div>
+
+	<div class="container" style="padding-top:2rem;">
+		<h1 class="page-title">My Cart
+			<span class="badge" th:text="${cartItems.size()} + ' items'">0 items</span>
+		</h1>
+
+		<div th:if="${cartItems.empty}" class="empty-state">
+			<i class="fas fa-shopping-bag"></i>
+			<h3>Your cart is empty</h3>
+			<p>Add some products to get started!</p>
+			<a th:href="@{/shop}" class="btn-primary">Continue Shopping</a>
+		</div>
+
+		<div class="cart-layout" th:unless="${cartItems.empty}">
+			<div class="cart-items">
+				<div th:each="item : ${cartItems}" class="cart-item">
+					<a th:href="@{/product/{id}(id=${item.product.id})}">
+						<img th:src="${item.product.imageUrl}" th:alt="${item.product.name}"
+							onerror="this.src='https://via.placeholder.com/80x80'" />
+					</a>
+					<div class="cart-item-info">
+						<h4><a th:href="@{/product/{id}(id=${item.product.id})}" th:text="${item.product.name}">Name</a>
+						</h4>
+						<span class="product-brand" th:text="${item.product.brand}">Brand</span>
+						<span th:if="${item.selectedSize != null
+					                  and !#strings.isEmpty(item.selectedSize)}">
+							<i class="fas fa-ruler" style="font-size:.7rem;"></i>
+							<strong>size: <span th:text="${item.selectedSize}"></span>
+						</span>
+						<strong
+							th:text="'₹' + ${#numbers.formatDecimal(item.product.price, 1, 'COMMA', 0, 'POINT')}">Price</strong>
+					</div>
+					<!-- ✅ NEW — no JavaScript, pure form submit -->
+					<div class="cart-item-controls">
+						<div class="qty-selector small" style="display:flex; align-items:center; gap:.3rem;">
+
+							<!-- MINUS button — submits quantity - 1 -->
+							<form th:action="@{/cart/update/{id}(id=${item.id})}" method="post">
+								<input type="hidden" name="quantity" th:value="${item.quantity - 1}" />
+								<button type="submit" class="qty-btn" th:disabled="${item.quantity <= 1}">
+									<i class="fas fa-minus"></i>
+								</button>
+							</form>
+
+							<!-- Current quantity display -->
+							<span style="min-width:32px; text-align:center;
+				                     font-weight:700; font-size:1rem;" th:text="${item.quantity}">1</span>
+
+							<!-- PLUS button — submits quantity + 1 -->
+							<form th:action="@{/cart/update/{id}(id=${item.id})}" method="post">
+								<input type="hidden" name="quantity" th:value="${item.quantity + 1}" />
+								<button type="submit" class="qty-btn">
+									<i class="fas fa-plus"></i>
+								</button>
+							</form>
+
+						</div>
+
+						<!-- Subtotal -->
+						<span class="item-subtotal" th:text="'₹' + ${#numbers.formatDecimal(
+				                   item.subtotal, 1, 'COMMA', 0, 'POINT')}">₹0</span>
+
+						<!-- Remove button -->
+						<form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post">
+							<button type="submit" class="btn-delete">
+								<strong>Cancel
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- Order Summary -->
+			<div class="cart-summary">
+				<h3>Order Summary</h3>
+				<div class="summary-row">
+					<span>Subtotal</span>
+					<strong th:text="'₹' + ${#numbers.formatDecimal(cartTotal, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+				</div>
+				<div class="summary-row">
+					<span>Shipping</span>
+					<strong>
+						<span th:if="${shippingCost.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+							class="free">FREE</span>
+						<span th:unless="${shippingCost.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+							th:text="'₹' + ${#numbers.formatDecimal(shippingCost, 1, 'COMMA', 0, 'POINT')}">₹49</span>
+					</strong>
+				</div>
+				<div class="summary-row total">
+					<span>Total</span>
+					<strong th:text="'₹' + ${#numbers.formatDecimal(grandTotal, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+				</div>
+				<a th:href="@{/checkout}" class="btn-primary btn-block btn-lg">
+					Proceed to Checkout <i class="fas fa-arrow-right"></i>
+				</a>
+				<a th:href="@{/shop}" class="btn-ghost btn-block" style="margin-top:.5rem;">
+					<i class="fas fa-arrow-left"></i> Continue Shopping
+				</a>
+				<p class="free-shipping-tip" th:if="${shippingCost.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+					<i class="fas fa-truck"></i> Add ₹<span
+						th:text="${#numbers.formatDecimal(500 - cartTotal.doubleValue(), 1, 0)}">0</span> more for free
+					shipping
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="~{fragments/layout :: footer}"></div>
+	<script th:src="@{/js/main.js}"></script>
+
+</body>
+
+</html>

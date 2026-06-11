@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>FAQ | ShopWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <style>
+        .faq-item {
+            border: 1px solid var(--clr-border);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .faq-question {
+            width: 100%; padding: 1.25rem 1.5rem;
+            background: #fff; border: none; cursor: pointer;
+            display: flex; justify-content: space-between;
+            align-items: center; font-size: 1rem;
+            font-weight: 600; font-family: inherit;
+            text-align: left; transition: all .2s;
+        }
+        .faq-question:hover { background: var(--clr-accent-light); }
+        .faq-answer {
+            display: none; padding: 1rem 1.5rem 1.5rem;
+            background: #fff; color: var(--clr-ink-muted);
+            line-height: 1.7; border-top: 1px solid var(--clr-border);
+        }
+        .faq-item.open .faq-answer { display: block; }
+        .faq-item.open .faq-icon { transform: rotate(180deg); }
+        .faq-icon { transition: transform .3s; color: #e8521a; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container" style="padding-top:2rem; padding-bottom:4rem;
+     max-width:800px;">
+    <h1 class="page-title">Frequently Asked Questions</h1>
+    <p style="color:#6b6560; margin-bottom:2rem;">
+        Find answers to common questions about ShopWave.
+    </p>
+
+    <h3 style="margin-bottom:1rem; font-size:1.1rem;">
+        🛒 Orders & Delivery
+    </h3>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            How do I track my order?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            You can track your order by visiting the
+            <a href="/track" style="color:#e8521a;">
+                Track My Order
+            </a>
+            page and entering your order number. You'll find
+            your order number in the confirmation email or
+            in your order history.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            How long does delivery take?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            Standard delivery takes 3–7 business days depending
+            on your location. Metro cities usually receive orders
+            within 2–3 days. Express delivery (1–2 days) is
+            available for select pin codes.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            Can I change or cancel my order?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            Orders can be cancelled within 1 hour of placing them.
+            After that, the order enters processing and cannot be
+            modified. Contact us at support@shopwave.com for
+            urgent cancellation requests.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            Do you deliver to all locations in India?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            We currently deliver to over 20,000 pin codes across
+            India. Enter your pin code at checkout to confirm
+            delivery availability for your area.
+        </div>
+    </div>
+
+    <h3 style="margin:2rem 0 1rem; font-size:1.1rem;">
+        💳 Payments
+    </h3>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            What payment methods do you accept?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            We accept Cash on Delivery (COD), UPI (PhonePe, GPay,
+            Paytm), Net Banking, and Credit/Debit Cards
+            (Visa, Mastercard, RuPay). All online payments are
+            secured with 256-bit SSL encryption.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            Is it safe to save my card details?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            Yes. We use industry-standard PCI-DSS compliant
+            payment processing. Your card details are never
+            stored on our servers — they are encrypted and
+            processed by our payment gateway directly.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            When will I get my refund?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            Refunds are processed within 5–7 business days after
+            we receive and verify the returned item. The amount
+            is credited back to your original payment method.
+            UPI/bank transfers may take an additional 2–3 days.
+        </div>
+    </div>
+
+    <h3 style="margin:2rem 0 1rem; font-size:1.1rem;">
+        📦 Returns & Exchanges
+    </h3>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            What is your return policy?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            We offer a 30-day hassle-free return policy.
+            Items must be unused, in original packaging,
+            and accompanied by the original receipt.
+            Visit our
+            <a href="/returns" style="color:#e8521a;">
+                Returns page
+            </a>
+            to initiate a return.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" type="button">
+            Can I exchange a product?
+            <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-answer">
+            Yes! Exchanges are available for size or colour
+            variants of the same product, subject to
+            availability. Contact our support team within
+            30 days of delivery to arrange an exchange.
+        </div>
+    </div>
+
+    <!-- Contact CTA -->
+    <div style="background:linear-gradient(135deg,#e8521a,#c94210);
+                color:#fff; border-radius:12px; padding:2rem;
+                text-align:center; margin-top:3rem;">
+        <h3 style="margin-bottom:.5rem;">Still have questions?</h3>
+        <p style="opacity:.9; margin-bottom:1.25rem;">
+            Our support team is available Mon–Sat, 9am–6pm IST
+        </p>
+        <a href="/contact"
+           style="background:#fff; color:#e8521a;
+                  padding:.75rem 1.75rem; border-radius:8px;
+                  font-weight:700; text-decoration:none;
+                  display:inline-block;">
+            Contact Us
+        </a>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

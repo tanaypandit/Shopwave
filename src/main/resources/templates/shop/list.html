@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle + ' | ShopWave'}">Shop | ShopWave</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<div class="shop-layout">
+    <!-- Sidebar -->
+    <aside class="shop-sidebar">
+        <div class="sidebar-section">
+            <h4>Categories</h4>
+            <ul class="category-list">
+                <li><a th:href="@{/shop}" th:classappend="${selectedCategory == null and keyword == null} ? 'active' : ''">All Products</a></li>
+                <li th:each="cat : ${categories}">
+                    <a th:href="@{/shop(categoryId=${cat.id})}"
+                       th:text="${cat.name}"
+                       th:classappend="${selectedCategory != null and selectedCategory.id == cat.id} ? 'active' : ''">
+                        Category
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="sidebar-section">
+            <h4>Sort By</h4>
+            <ul class="sort-list">
+                <li><a th:href="@{/shop(sort='newest')}" th:classappend="${sort == 'newest'} ? 'active' : ''">Newest First</a></li>
+                <li><a th:href="@{/shop(sort='rating')}" th:classappend="${sort == 'rating'} ? 'active' : ''">Top Rated</a></li>
+                <li><a th:href="@{/shop(sort='price_asc')}" th:classappend="${sort == 'price_asc'} ? 'active' : ''">Price: Low to High</a></li>
+                <li><a th:href="@{/shop(sort='price_desc')}" th:classappend="${sort == 'price_desc'} ? 'active' : ''">Price: High to Low</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="shop-main">
+        <div class="shop-header">
+            <h1 th:text="${pageTitle}">All Products</h1>
+            <span th:text="${products.totalElements + ' products found'}">0 products</span>
+        </div>
+
+        <div th:if="${products.content.empty}" class="empty-state">
+            <i class="fas fa-search"></i>
+            <h3>No products found</h3>
+            <p>Try different keywords or browse all categories</p>
+            <a th:href="@{/shop}" class="btn-primary">Browse All</a>
+        </div>
+
+        <div class="products-grid" th:unless="${products.content.empty}">
+            <div th:each="product : ${products.content}" class="product-card">
+                <a th:href="@{/product/{id}(id=${product.id})}" class="product-img-wrap">
+                    <img th:src="${product.imageUrl}" th:alt="${product.name}"
+                         onerror="this.src='https://via.placeholder.com/300x300'"/>
+                    <div class="product-badge" th:if="${product.stockQuantity < 10 and product.stockQuantity > 0}">Low Stock</div>
+                    <div class="product-badge sold-out" th:unless="${product.inStock}">Sold Out</div>
+                </a>
+                <div class="product-info">
+                    <span class="product-brand" th:text="${product.brand}">Brand</span>
+                    <h3><a th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Name</a></h3>
+                    <div class="product-rating">
+                        <span class="stars" th:data-rating="${product.rating}">★★★★★</span>
+                        <span th:text="'(' + ${product.reviewCount} + ')'"></span>
+                    </div>
+                    <div class="product-footer">
+                        <strong class="price" th:text="'₹' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+						<!--         non-fashion products add directly to cart as before     -->
+						<th:block th:if="${product.inStock}" sec:authorize="hasRole('CUSTOMER')">
+
+						    <!-- Fashion: redirect to product page to pick size first -->
+						    <a th:if="${product.category != null
+						               and product.category.name == 'Fashion'}"
+						       th:href="@{/product/{id}(id=${product.id})}"
+						       class="btn-cart"
+						       title="Select size to add to cart">
+						        <i class="fas fa-cart-plus"></i>
+						    </a>
+
+						    <!-- Non-fashion: add directly to cart as before -->
+						    <form th:unless="${product.category != null
+						                      and product.category.name == 'Fashion'}"
+						          th:action="@{/cart/add}" method="post">
+						        <input type="hidden" name="productId" th:value="${product.id}"/>
+						        <input type="hidden" name="quantity" value="1"/>
+						        <button type="submit" class="btn-cart">
+						            <i class="fas fa-cart-plus"></i>
+						        </button>
+						    </form>
+
+						</th:block>
+
+						<!-- Anonymous users: prompt login -->
+						<a th:href="@{/login}" class="btn-cart" sec:authorize="isAnonymous()">
+						    <i class="fas fa-cart-plus"></i>
+						</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" th:if="${products.totalPages > 1}">
+            <a th:if="${!products.first}"
+               th:href="@{/shop(page=${currentPage - 1}, sort=${sort})}"
+               class="page-btn"><i class="fas fa-chevron-left"></i></a>
+            <span th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}">
+                <a th:href="@{/shop(page=${i}, sort=${sort})}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == currentPage} ? 'active' : ''"
+                   class="page-btn">1</a>
+            </span>
+            <a th:if="${!products.last}"
+               th:href="@{/shop(page=${currentPage + 1}, sort=${sort})}"
+               class="page-btn"><i class="fas fa-chevron-right"></i></a>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/main.js}"></script>
+<script>
+function changeQty(delta) {
+    const input = document.getElementById('qty');
+    const max = parseInt(input.max) || 999;
+    const newVal = Math.max(1, Math.min(max, parseInt(input.value) + delta));
+    input.value = newVal;
+}
+
+function validateSize(form) {
+    // ✅ Check if size selector exists on this page
+    const defaultInput = document.getElementById('sizeDefault');
+    if (!defaultInput) return true; // not a fashion product — allow
+
+    // ✅ Check if a real size was selected (not the hidden default)
+    const selected = form.querySelector(
+        'input[name="selectedSize"]:checked');
+    if (!selected || selected.value === 'SELECT_SIZE') {
+        alert('Please select a size (XS, S, M, L, XL or XXL) before adding to cart.');
+        return false;
+    }
+    return true;
+}
+</script>
+</body>
+</html>

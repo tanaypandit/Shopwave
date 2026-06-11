@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Assign Delivery Partner | ShopWave Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/admin.css}"/>
+</head>
+<body class="admin-body">
+
+<div th:replace="~{fragments/admin-nav :: admin-nav}"></div>
+
+<div class="admin-content">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="admin-page-header">
+        <h1><i class="fas fa-user-plus" style="color:#e8521a;"></i> Assign Delivery Partner</h1>
+        
+    </div>
+
+    <div style="max-width:600px;">
+
+        <!-- Order Summary Card -->
+        <div class="checkout-card" style="margin-bottom:1.5rem;">
+			
+			<div th:if="${order.status.name() == 'CANCELLED'}"
+						     style="background:#fee2e2; border:1px solid #dc2626;
+						            color:#991b1b; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+						    <i class="fas fa-ban"></i>
+						    This order has been <strong>cancelled</strong> and cannot be assigned.
+							
+						</div>
+						<div th:if="${order.status.name() == 'DELIVERED'}"
+						     style="background:#ecfeff; border:1px solid #0891b2;
+						            color:#155e75; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+						    <i class="fas fa-check-circle"></i>
+						    This order is already delivered and cannot be reassigned.
+							
+						</div>
+						
+			
+            <h3 style="margin-bottom:1rem;">Order Details</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:.75rem; font-size:.9rem;">
+                <div>
+                    <span style="color:#6b6560; font-size:.8rem;">Order Number</span>
+                    <strong style="display:block;" th:text="${order.orderNumber}"></strong>
+                </div>
+                <div>
+                    <span style="color:#6b6560; font-size:.8rem;">Status</span>
+                    <span th:text="${order.status}" class="status-badge"
+                          th:classappend="'status-' + ${order.status.name().toLowerCase()}"
+                          style="display:block; width:fit-content; margin-top:.2rem;">
+                    </span>
+                </div>
+                <div>
+                    <span style="color:#6b6560; font-size:.8rem;">Customer</span>
+                    <strong style="display:block;" th:text="${order.shippingName}"></strong>
+                </div>
+                <div>
+                    <span style="color:#6b6560; font-size:.8rem;">City</span>
+                    <strong style="display:block;"
+                            th:text="${order.shippingCity + ', ' + order.shippingState}">
+                    </strong>
+                </div>
+                <div>
+                    <span style="color:#6b6560; font-size:.8rem;">Delivery Slot</span>
+                    <strong style="display:block;"
+                            th:text="${order.deliverySlot != null
+                                     ? order.deliverySlot : 'Not selected'}">
+                    </strong>
+                </div>
+                <div>
+                    <span style="color:#6b6560; font-size:.8rem;">Total</span>
+                    <strong style="display:block; color:#e8521a;"
+                            th:text="'₹' + ${#numbers.formatDecimal(
+                                     order.totalAmount,1,'COMMA',0,'POINT')}">
+                    </strong>
+                </div>
+				
+            </div>
+
+            <!-- Current assignment status -->
+            <div th:if="${order.assignedTo != null}"
+                 style="margin-top:1rem; padding:.75rem 1rem;
+                        background:#f0fdf4; border:1px solid #1a9e5c;
+                        border-radius:8px; font-size:.88rem;">
+                <i class="fas fa-check-circle" style="color:#1a9e5c;"></i>
+                Currently assigned to:
+                <strong th:text="${order.assignedTo.fullName}"></strong>
+            </div>
+        </div>
+
+        <!-- No delivery partners registered -->
+        <div th:if="${deliveryPartners.empty}"
+             style="background:#fef2f2; border:1px solid #fecaca;
+                    color:#991b1b; padding:1.25rem; border-radius:8px;">
+            <i class="fas fa-exclamation-circle"></i>
+            No delivery partners registered yet. They need to register
+            with the DELIVERY role first.
+        </div>
+
+        <!-- Assign Form -->
+		<div th:if="${!deliveryPartners.empty and order.status.name() != 'CANCELLED' and order.status.name() != 'DELIVERED'}"
+		     class="checkout-card">
+            <h3 style="margin-bottom:1rem;">Select Delivery Partner</h3>
+			
+
+            <form th:action="@{/admin/orders/{id}/assign(id=${order.id})}"
+                  method="post">
+                <div style="display:flex; flex-direction:column;
+                            gap:.6rem; margin-bottom:1.5rem;">
+                    <label th:each="partner : ${deliveryPartners}"
+                           style="display:flex; align-items:center;
+                                  gap:.75rem; padding:.85rem 1rem;
+                                  border:1.5px solid #e8e4df;
+                                  border-radius:8px; cursor:pointer;
+                                  transition:border-color .2s;">
+                        <input type="radio" name="deliveryUserId"
+                               th:value="${partner.id}" required
+                               style="accent-color:#e8521a;
+                                      width:18px; height:18px; flex-shrink:0;"/>
+                        <div>
+                            <strong style="display:block;"
+                                    th:text="${partner.fullName}"></strong>
+                            <span style="font-size:.82rem; color:#6b6560;"
+                                  th:text="${partner.email}"></span>
+                            <span style="font-size:.82rem; color:#6b6560;
+                                         margin-left:.5rem;"
+                                  th:text="${partner.phone}"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display:flex; gap:.75rem;">
+					<button type="submit" class="btn-primary"
+					        th:disabled="${order.status.name() == 'CANCELLED' or order.status.name() == 'DELIVERED'}">
+					    <i class="fas fa-check"></i> Assign Partner
+					</button>
+                    <a th:href="@{/admin/orders}" class="btn-outline">
+                        Cancel
+                    </a>
+					<a th:href="@{/admin/orders}" class="btn-outline">
+					            <i class="fas fa-arrow-left"></i> Back to Orders
+					</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

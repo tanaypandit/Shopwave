@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Order Detail | Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/admin.css}"/>
+</head>
+<body class="admin-body">
+<div th:replace="~{fragments/admin-nav :: admin-nav}"></div>
+
+<div class="admin-content">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <!-- Header -->
+    <div class="admin-page-header">
+        <div>
+            <h1>
+                <i class="fas fa-receipt" style="color:#e8521a;"></i>
+                Order Details
+            </h1>
+            <span style="color:#6b6560; font-size:.9rem;"
+                  th:text="${order.orderNumber}"></span>
+        </div>
+        <a th:href="@{/admin/orders}" class="btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Orders
+        </a>
+    </div>
+
+    <!-- ✅ Return / Exchange alert banner -->
+    <div th:if="${order.status.name() == 'RETURN_REQUESTED'
+                 or order.status.name() == 'EXCHANGE_REQUESTED'}"
+         style="background:#fff0ea; border:2px solid #e8521a;
+                border-radius:10px; padding:1.25rem 1.5rem;
+                margin-bottom:1.5rem; display:flex;
+                align-items:flex-start; gap:1rem;">
+        <i class="fas fa-exclamation-triangle"
+           style="color:#e8521a; font-size:1.5rem; margin-top:.1rem;"></i>
+        <div>
+            <strong style="display:block; font-size:1rem; color:#c94210;"
+                    th:text="${order.status.name() == 'RETURN_REQUESTED'}
+                              ? 'Customer has requested a RETURN_REQUESTED'
+                              : 'Customer has requested an EXCHANGE_REQUESTED'">
+            </strong>
+            <span style="font-size:.88rem; color:#6b6560;"
+                  th:text="${order.returnReason != null
+                            ? 'Reason: ' + order.returnReason
+                            : 'No reason provided'}">
+            </span>
+            <div style="margin-top:.75rem;">
+                <form th:action="@{/admin/orders/{id}/status(id=${order.id})}"
+                      method="post" style="display:inline-flex; gap:.5rem;">
+                    <select name="status"
+                            style="border:1.5px solid #e8521a; border-radius:8px;
+                                   padding:.4rem .75rem; font-size:.85rem;">
+                        <option value="REFUNDED">Approve — Refund</option>
+                        <option value="PROCESSING">Approve — Send Replacement</option>
+                        <option value="RETURN"
+                                th:selected="true">Keep as Pending</option>
+                    </select>
+                    <button type="submit"
+                            style="background:#e8521a; color:#fff; border:none;
+                                   border-radius:8px; padding:.45rem 1rem;
+                                   font-weight:600; cursor:pointer;
+                                   font-size:.85rem;">
+                        Resolve
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 360px;
+                gap:1.5rem; align-items:start;">
+
+        <!-- LEFT — Main order info -->
+        <div>
+
+            <!-- Customer Info -->
+            <div class="admin-card" style="margin-bottom:1.25rem;">
+                <h3 style="margin-bottom:1rem; font-size:1rem;
+                           border-bottom:1px solid #e8e4df;
+                           padding-bottom:.75rem;">
+                    <i class="fas fa-user" style="color:#e8521a;"></i>
+                    Customer Information
+                </h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr;
+                            gap:1rem;">
+                    <div>
+                        <span style="font-size:.78rem; color:#6b6560;
+                                     text-transform:uppercase;
+                                     letter-spacing:.06em;">Full Name</span>
+                        <strong style="display:block; margin-top:.2rem;"
+                                th:text="${order.user.fullName}"></strong>
+                    </div>
+                    <div>
+                        <span style="font-size:.78rem; color:#6b6560;
+                                     text-transform:uppercase;
+                                     letter-spacing:.06em;">Email</span>
+                        <strong style="display:block; margin-top:.2rem;"
+                                th:text="${order.user.email}"></strong>
+                    </div>
+                    <div>
+                        <span style="font-size:.78rem; color:#6b6560;
+                                     text-transform:uppercase;
+                                     letter-spacing:.06em;">Phone</span>
+                        <strong style="display:block; margin-top:.2rem;"
+                                th:text="${order.user.phone}"></strong>
+                    </div>
+                    <div>
+                        <span style="font-size:.78rem; color:#6b6560;
+                                     text-transform:uppercase;
+                                     letter-spacing:.06em;">Member Since</span>
+                        <strong style="display:block; margin-top:.2rem;"
+                                th:text="${#temporals.format(
+                                          order.user.createdAt,
+                                          'dd MMM yyyy')}"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="admin-card" style="margin-bottom:1.25rem;">
+                <h3 style="margin-bottom:1rem; font-size:1rem;
+                           border-bottom:1px solid #e8e4df;
+                           padding-bottom:.75rem;">
+                    <i class="fas fa-map-marker-alt"
+                       style="color:#e8521a;"></i>
+                    Shipping Address
+                </h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr;
+                            gap:1rem;">
+                    <div>
+                        <span style="font-size:.78rem; color:#6b6560;">
+                            Recipient Name</span>
+                        <strong style="display:block; margin-top:.2rem;"
+                                th:text="${order.shippingName}"></strong>
+                    </div>
+                    <div>
+                        <span style="font-size:.78rem; color:#6b6560;">
+                            Phone</span>
+                        <strong style="display:block; margin-top:.2rem;"
+                                th:text="${order.shippingPhone}"></strong>
+                    </div>
+                    <div style="grid-column:span 2;">
+                        <span style="font-size:.78rem; color:#6b6560;">
+                            Full Address</span>
+                        <strong style="display:block; margin-top:.2rem;"
+                                th:text="${order.shippingAddress + ', ' +
+                                          order.shippingCity + ', ' +
+                                          order.shippingState + ' - ' +
+                                          order.shippingZip}">
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="admin-card">
+                <h3 style="margin-bottom:1rem; font-size:1rem;
+                           border-bottom:1px solid #e8e4df;
+                           padding-bottom:.75rem;">
+                    <i class="fas fa-box" style="color:#e8521a;"></i>
+                    Order Items
+                    <span style="font-size:.82rem; color:#6b6560;
+                                 font-weight:400; margin-left:.5rem;"
+                          th:text="'(' + ${order.orderItems.size()}
+                                   + ' items)'"></span>
+                </h3>
+
+                <table style="width:100%; border-collapse:collapse;
+                              font-size:.9rem;">
+                    <thead>
+                        <tr style="background:#f4f1ed;">
+                            <th style="padding:.65rem .75rem;
+                                       text-align:left; border-radius:8px 0 0 8px;">
+                                Product</th>
+                            <th style="padding:.65rem .75rem;
+                                       text-align:right;">Unit Price</th>
+                            <th style="padding:.65rem .75rem;
+                                       text-align:center;">Qty</th>
+                            <th style="padding:.65rem .75rem;
+                                       text-align:right;
+                                       border-radius:0 8px 8px 0;">
+                                Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${order.orderItems}"
+                            style="border-bottom:1px solid #f4f1ed;">
+                            <td style="padding:.75rem;">
+                                <div style="display:flex;
+                                            align-items:center; gap:.75rem;">
+                                    <img th:src="${item.product.imageUrl}"
+                                         th:alt="${item.product.name}"
+                                         style="width:50px; height:50px;
+                                                object-fit:cover;
+                                                border-radius:8px;"
+                                         onerror="this.src='https://via.placeholder.com/50'"/>
+                                    <div>
+                                        <strong style="display:block;"
+                                                th:text="${item.product.name}">
+                                        </strong>
+                                        <span th:if="${item.selectedSize != null
+                                                      and !#strings.isEmpty(
+                                                      item.selectedSize)}"
+                                              style="display:inline-block;
+                                                     background:#fff0ea;
+                                                     color:#e8521a;
+                                                     font-size:.7rem;
+                                                     font-weight:700;
+                                                     padding:.1rem .5rem;
+                                                     border-radius:99px;
+                                                     border:1px solid #e8521a;
+                                                     margin:.2rem 0;">
+                                            Size:
+                                            <span th:text="${item.selectedSize}">
+                                            </span>
+                                        </span>
+                                        <span style="display:block;
+                                                     font-size:.8rem;
+                                                     color:#6b6560;"
+                                              th:text="${item.product.brand}">
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding:.75rem; text-align:right;"
+                                th:text="'₹' + ${#numbers.formatDecimal(
+                                         item.unitPrice,1,'COMMA',0,'POINT')}">
+                            </td>
+                            <td style="padding:.75rem; text-align:center;"
+                                th:text="${item.quantity}"></td>
+                            <td style="padding:.75rem; text-align:right;
+                                       font-weight:600;"
+                                th:text="'₹' + ${#numbers.formatDecimal(
+                                         item.subtotal,1,'COMMA',0,'POINT')}">
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="background:#f4f1ed;">
+                            <td colspan="3"
+                                style="padding:.75rem; text-align:right;
+                                       font-weight:600;">Shipping</td>
+                            <td style="padding:.75rem; text-align:right;
+                                       color:#1a9e5c; font-weight:700;">
+                                <span th:if="${order.shippingCost
+                                             .compareTo(T(java.math.BigDecimal)
+                                             .ZERO) == 0}">FREE</span>
+                                <span th:unless="${order.shippingCost
+                                                 .compareTo(T(java.math.BigDecimal)
+                                                 .ZERO) == 0}"
+                                      th:text="'₹' + ${#numbers.formatDecimal(
+                                               order.shippingCost,1,
+                                               'COMMA',0,'POINT')}">
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"
+                                style="padding:.75rem; text-align:right;
+                                       font-weight:700; font-size:1rem;">
+                                Grand Total</td>
+                            <td style="padding:.75rem; text-align:right;
+                                       font-weight:700; font-size:1.1rem;
+                                       color:#e8521a;"
+                                th:text="'₹' + ${#numbers.formatDecimal(
+                                         order.totalAmount,1,'COMMA',0,'POINT')}">
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- RIGHT — Sidebar -->
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+
+            <!-- Order Summary -->
+            <div class="admin-card">
+                <h3 style="margin-bottom:1rem; font-size:1rem;
+                           border-bottom:1px solid #e8e4df;
+                           padding-bottom:.75rem;">
+                    <i class="fas fa-info-circle"
+                       style="color:#e8521a;"></i>
+                    Order Summary
+                </h3>
+                <div style="display:flex; flex-direction:column; gap:.75rem;
+                            font-size:.88rem;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Order ID</span>
+                        <strong th:text="${order.id}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Placed On</span>
+                        <strong th:text="${#temporals.format(
+                                          order.createdAt,
+                                          'dd MMM yyyy, hh:mm a')}">
+                        </strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Status</span>
+                        <span class="status-badge"
+                              th:classappend="'status-' +
+                              ${order.status.name().toLowerCase()}"
+                              th:text="${order.status}"></span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Payment</span>
+                        <strong th:text="${order.paymentMethod}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Payment Status</span>
+                        <strong th:text="${order.paymentStatus}"></strong>
+                    </div>
+                    <div th:if="${order.deliverySlot != null
+                                 and !#strings.isEmpty(order.deliverySlot)}"
+                         style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Delivery Slot</span>
+                        <strong style="color:#e8521a;"
+                                th:text="${order.deliverySlot}"></strong>
+                    </div>
+                    <div th:if="${order.estimatedDeliveryDate != null}"
+                         style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Est. Delivery</span>
+                        <strong th:text="${order.estimatedDeliveryDate}">
+                        </strong>
+                    </div>
+                    <div th:if="${order.assignedTo != null}"
+                         style="display:flex; justify-content:space-between;">
+                        <span style="color:#6b6560;">Delivery Partner</span>
+                        <strong style="color:#1a9e5c;"
+                                th:text="${order.assignedTo.fullName}">
+                        </strong>
+                    </div>
+                </div>
+            </div>
+           
+            
+            <!-- Delivery note -->
+            <div class="admin-card"
+                 th:if="${order.deliveryNote != null
+                          and !#strings.isEmpty(order.deliveryNote)}">
+                <h3 style="margin-bottom:.75rem; font-size:1rem;">
+                    <i class="fas fa-sticky-note"
+                       style="color:#e8521a;"></i> Note
+                </h3>
+                <p style="font-size:.88rem; color:#6b6560; font-style:italic;"
+                   th:text="${order.deliveryNote}"></p>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

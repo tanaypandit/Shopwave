@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Order Detail | ShopWave Delivery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body style="background:#f0ede9; min-height:100vh; padding:2rem;">
+<div style="max-width:800px; margin:0 auto;">
+
+    <!-- Header -->
+    <div style="display:flex; align-items:center;
+                justify-content:space-between; margin-bottom:2rem;">
+        <h1 style="font-family:'Syne',sans-serif; font-size:1.5rem;">
+            <i class="fas fa-box" style="color:#e8521a;"></i>
+            Order Details
+        </h1>
+        <a th:href="@{/delivery/dashboard}"
+           style="background:#e8521a; color:#fff; border-radius:8px;
+                  padding:.55rem 1.2rem; font-weight:600;
+                  text-decoration:none; font-size:.9rem;">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Order Header Card -->
+    <div style="background:#fff; border-radius:12px;
+                padding:1.5rem; margin-bottom:1.25rem;
+                border:1px solid #e8e4df;
+                box-shadow:0 2px 12px rgba(0,0,0,.07);">
+        <div style="display:flex; justify-content:space-between;
+                    align-items:center; margin-bottom:1.25rem;
+                    padding-bottom:1rem;
+                    border-bottom:1px solid #e8e4df;">
+            <div>
+                <h2 style="font-size:1.2rem; margin-bottom:.25rem;"
+                    th:text="'Order #' + ${order.orderNumber}"></h2>
+                <span style="color:#6b6560; font-size:.85rem;"
+                      th:text="'Placed on ' + ${#temporals.format(
+                               order.createdAt, 'dd MMMM yyyy, hh:mm a')}">
+                </span>
+            </div>
+            <span th:text="${order.status}" class="status-badge"
+                  th:classappend="'status-' +
+                  ${order.status.name().toLowerCase()}">
+            </span>
+        </div>
+
+        <!-- Delivery Slot -->
+        <div th:if="${order.deliverySlot != null
+                     and !#strings.isEmpty(order.deliverySlot)}"
+             style="background:#fff0ea; border:1px solid #e8521a;
+                    border-radius:8px; padding:.85rem 1rem;
+                    margin-bottom:1.25rem; display:flex;
+                    align-items:center; gap:.75rem;">
+            <i class="fas fa-clock"
+               style="color:#e8521a; font-size:1.2rem;"></i>
+            <div>
+                <strong style="display:block; font-size:.9rem;">
+                    Customer's Preferred Delivery Slot
+                </strong>
+                <span th:text="${order.deliverySlot}"
+                      style="color:#6b6560; font-size:.85rem;"></span>
+            </div>
+        </div>
+
+        <!-- Estimated Delivery -->
+        <div th:if="${order.estimatedDeliveryDate != null}"
+             style="background:#f0fdf4; border:1px solid #1a9e5c;
+                    border-radius:8px; padding:.85rem 1rem;
+                    margin-bottom:1.25rem; display:flex;
+                    align-items:center; gap:.75rem;">
+            <i class="fas fa-calendar-check"
+               style="color:#1a9e5c; font-size:1.2rem;"></i>
+            <div>
+                <strong style="display:block; font-size:.9rem;">
+                    Estimated Delivery Date
+                </strong>
+                <span th:text="${order.estimatedDeliveryDate}"
+                      style="color:#6b6560; font-size:.85rem;"></span>
+            </div>
+        </div>
+
+        <!-- Customer & Address -->
+        <div style="display:grid; grid-template-columns:1fr 1fr;
+                    gap:1rem; margin-bottom:1.25rem;">
+            <div style="background:#f4f1ed; border-radius:8px;
+                        padding:1rem;">
+                <strong style="font-size:.82rem; text-transform:uppercase;
+                               letter-spacing:.05em; color:#6b6560;">
+                    Customer
+                </strong>
+                <p style="font-weight:700; margin:.4rem 0 .2rem;"
+                   th:text="${order.shippingName}"></p>
+                <p style="color:#6b6560; font-size:.85rem; margin:0;"
+                   th:text="${order.shippingPhone}"></p>
+            </div>
+            <div style="background:#f4f1ed; border-radius:8px;
+                        padding:1rem;">
+                <strong style="font-size:.82rem; text-transform:uppercase;
+                               letter-spacing:.05em; color:#6b6560;">
+                    Delivery Address
+                </strong>
+                <p style="font-weight:600; margin:.4rem 0 .2rem;"
+                   th:text="${order.shippingAddress}"></p>
+                <p style="color:#6b6560; font-size:.85rem; margin:0;"
+                   th:text="${order.shippingCity + ', ' +
+                             order.shippingState + ' - ' +
+                             order.shippingZip}"></p>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div style="background:#f4f1ed; border-radius:8px;
+                    padding:1rem; margin-bottom:1.25rem;
+                    display:flex; gap:2rem; align-items:center;">
+            <div>
+                <strong style="font-size:.82rem; color:#6b6560;">
+                    Payment Method
+                </strong>
+                <p style="font-weight:700; margin:.2rem 0 0;"
+                   th:text="${order.paymentMethod}"></p>
+            </div>
+            <div>
+                <strong style="font-size:.82rem; color:#6b6560;">
+                    Payment Status
+                </strong>
+                <span th:text="${order.paymentStatus}"
+                      class="pay-badge"
+                      th:classappend="'pay-' + ${order.paymentStatus
+                                     .name().toLowerCase()}"
+                      style="display:block; margin-top:.2rem;
+                             width:fit-content;"></span>
+            </div>
+            <div>
+                <strong style="font-size:.82rem; color:#6b6560;">
+                    Total Amount
+                </strong>
+                <p style="font-weight:700; font-size:1.1rem;
+                           color:#e8521a; margin:.2rem 0 0;"
+                   th:text="'₹' + ${#numbers.formatDecimal(
+                            order.totalAmount,1,'COMMA',0,'POINT')}">
+                </p>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <strong style="display:block; margin-bottom:.75rem;">
+            Items in this order
+        </strong>
+        <div th:each="item : ${order.orderItems}"
+             style="display:flex; align-items:center; gap:.75rem;
+                    padding:.65rem 0; border-bottom:1px solid #f4f1ed;">
+            <img th:src="${item.product.imageUrl}"
+                 th:alt="${item.product.name}"
+                 style="width:50px; height:50px; object-fit:cover;
+                        border-radius:8px;"
+                 onerror="this.src='https://via.placeholder.com/50'"/>
+            <div style="flex:1;">
+                <strong style="display:block; font-size:.9rem;"
+                        th:text="${item.product.name}"></strong>
+                <!-- Size badge -->
+                <span th:if="${item.selectedSize != null
+                              and !#strings.isEmpty(item.selectedSize)}"
+                      style="display:inline-block; background:#fff0ea;
+                             color:#e8521a; font-size:.72rem;
+                             font-weight:700; padding:.1rem .5rem;
+                             border-radius:99px; border:1px solid #e8521a;
+                             margin:.2rem 0;">
+                    Size: <span th:text="${item.selectedSize}"></span>
+                </span>
+                <span style="color:#6b6560; font-size:.82rem; display:block;"
+                      th:text="${item.product.brand}"></span>
+            </div>
+            <div style="text-align:right;">
+                <span style="color:#6b6560; font-size:.82rem;"
+                      th:text="'Qty: ' + ${item.quantity}"></span>
+                <strong style="display:block;"
+                        th:text="'₹' + ${#numbers.formatDecimal(
+                                 item.subtotal,1,'COMMA',0,'POINT')}">
+                </strong>
+            </div>
+        </div>
+
+        <!-- Delivery Note if any -->
+        <div th:if="${order.deliveryNote != null
+                     and !#strings.isEmpty(order.deliveryNote)}"
+             style="margin-top:1rem; background:#f4f1ed;
+                    border-radius:8px; padding:.85rem 1rem;">
+            <strong style="font-size:.85rem;">
+                <i class="fas fa-sticky-note"></i> Delivery Note:
+            </strong>
+            <p th:text="${order.deliveryNote}"
+               style="margin:.25rem 0 0; color:#6b6560;
+                      font-size:.88rem;"></p>
+        </div>
+    </div>
+
+    <!-- Update Status Form -->
+    <div style="background:#fff; border-radius:12px;
+                padding:1.5rem; border:1px solid #e8e4df;
+                box-shadow:0 2px 12px rgba(0,0,0,.07);">
+        <h3 style="margin-bottom:1rem;">
+            <i class="fas fa-edit" style="color:#e8521a;"></i>
+            Update Status
+        </h3>
+        <form th:action="@{/delivery/orders/{id}/update(id=${order.id})}"
+              method="post"
+              style="display:flex; gap:.75rem;
+                     align-items:flex-end; flex-wrap:wrap;">
+            <div style="display:flex; flex-direction:column; gap:.35rem;">
+                <label style="font-size:.8rem; font-weight:600;">
+                    New Status
+                </label>
+                <select name="status"
+                        style="border:1.5px solid #e8e4df;
+                               border-radius:8px; padding:.55rem .9rem;
+                               font-size:.9rem; outline:none;">
+                    <option value="PROCESSING"
+                            th:selected="${order.status.name()
+                                         == 'PROCESSING'}">
+                        Processing
+                    </option>
+                    <option value="SHIPPED"
+                            th:selected="${order.status.name()
+                                         == 'SHIPPED'}">
+                        Shipped / Out for Delivery
+                    </option>
+                    <option value="DELIVERED"
+                            th:selected="${order.status.name()
+                                         == 'DELIVERED'}">
+                        Delivered
+                    </option>
+                    <option value="CANCELLED"
+                            th:selected="${order.status.name()
+                                         == 'CANCELLED'}">
+                        Cancelled
+                    </option>
+                </select>
+            </div>
+            <div style="display:flex; flex-direction:column;
+                        gap:.35rem; flex:1;">
+                <label style="font-size:.8rem; font-weight:600;">
+                    Delivery Note (optional)
+                </label>
+                <input type="text" name="deliveryNote"
+                       th:value="${order.deliveryNote}"
+                       placeholder="e.g. Left at door, Called customer..."
+                       style="border:1.5px solid #e8e4df;
+                              border-radius:8px; padding:.55rem .9rem;
+                              font-size:.9rem; outline:none;"/>
+            </div>
+            <button type="submit"
+                    style="background:#e8521a; color:#fff; border:none;
+                           border-radius:8px; padding:.65rem 1.4rem;
+                           font-weight:600; cursor:pointer;
+                           font-size:.9rem; white-space:nowrap;">
+                <i class="fas fa-check"></i> Update Status
+            </button>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

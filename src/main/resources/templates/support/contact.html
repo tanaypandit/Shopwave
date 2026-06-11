@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Contact Us | ShopWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container" style="padding-top:2rem; padding-bottom:4rem;">
+    <h1 class="page-title">Contact Us</h1>
+
+    <div style="display:grid; grid-template-columns:1fr 1.5fr;
+                gap:3rem; align-items:start;">
+
+        <!-- Contact Info -->
+        <div>
+            <div style="background:#fff; border-radius:12px;
+                        border:1px solid #e8e4df; padding:1.5rem;
+                        margin-bottom:1rem;">
+                <h3 style="margin-bottom:1.25rem;">Get in Touch</h3>
+
+                <div style="display:flex; align-items:center;
+                            gap:1rem; margin-bottom:1.25rem;">
+                    <div style="width:44px; height:44px;
+                                background:#fff0ea; border-radius:10px;
+                                display:flex; align-items:center;
+                                justify-content:center; flex-shrink:0;">
+                        <i class="fas fa-envelope"
+                           style="color:#e8521a;"></i>
+                    </div>
+                    <div>
+                        <strong style="display:block; font-size:.9rem;">
+                            Email
+                        </strong>
+                        <a href="mailto:support@shopwave.com"
+                           style="color:#e8521a; font-size:.9rem;">
+                            support@shopwave.com
+                        </a>
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:center;
+                            gap:1rem; margin-bottom:1.25rem;">
+                    <div style="width:44px; height:44px;
+                                background:#fff0ea; border-radius:10px;
+                                display:flex; align-items:center;
+                                justify-content:center; flex-shrink:0;">
+                        <i class="fas fa-phone"
+                           style="color:#e8521a;"></i>
+                    </div>
+                    <div>
+                        <strong style="display:block; font-size:.9rem;">
+                            Phone
+                        </strong>
+                        <span style="color:#6b6560; font-size:.9rem;">
+                            +91 98765 43210
+                        </span><br/>
+                        <span style="color:#6b6560; font-size:.8rem;">
+                            Mon–Sat, 9am–6pm IST
+                        </span>
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:1rem;">
+                    <div style="width:44px; height:44px;
+                                background:#fff0ea; border-radius:10px;
+                                display:flex; align-items:center;
+                                justify-content:center; flex-shrink:0;">
+                        <i class="fas fa-map-marker-alt"
+                           style="color:#e8521a;"></i>
+                    </div>
+                    <div>
+                        <strong style="display:block; font-size:.9rem;">
+                            Address
+                        </strong>
+                        <span style="color:#6b6560; font-size:.9rem;">
+                            ShopWave HQ, 42 Tech Park,<br/>
+                            Pune, Maharashtra - 411001
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:#fff; border-radius:12px;
+                        border:1px solid #e8e4df; padding:1.5rem;">
+                <h4 style="margin-bottom:.75rem;">Follow Us</h4>
+                <div style="display:flex; gap:.75rem;">
+                    <a href="#" style="width:40px; height:40px;
+                       border-radius:50%; background:#fff0ea;
+                       display:flex; align-items:center;
+                       justify-content:center; color:#e8521a;
+                       text-decoration:none;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" style="width:40px; height:40px;
+                       border-radius:50%; background:#fff0ea;
+                       display:flex; align-items:center;
+                       justify-content:center; color:#e8521a;
+                       text-decoration:none;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" style="width:40px; height:40px;
+                       border-radius:50%; background:#fff0ea;
+                       display:flex; align-items:center;
+                       justify-content:center; color:#e8521a;
+                       text-decoration:none;">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div style="background:#fff; border-radius:12px;
+                    border:1px solid #e8e4df; padding:2rem;">
+
+            <div th:if="${success}"
+                 style="background:#f0fdf4; border:1px solid #bbf7d0;
+                        color:#166534; padding:1rem; border-radius:8px;
+                        margin-bottom:1.5rem;">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+
+            <h3 style="margin-bottom:1.5rem;">Send a Message</h3>
+
+            <form th:action="@{/contact}" method="post"
+                  style="display:flex; flex-direction:column; gap:1rem;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Your Name *</label>
+                        <input type="text" name="name"
+                               required placeholder="Enter Name"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" name="email"
+                               required placeholder="Enter email"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select name="subject">
+                        <option value="Order Issue">Order Issue</option>
+                        <option value="Payment Issue">
+                            Payment Issue
+                        </option>
+                        <option value="Return/Refund">
+                            Return / Refund
+                        </option>
+                        <option value="Product Query">
+                            Product Query
+                        </option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message *</label>
+                    <textarea name="message" rows="5" required
+                              placeholder="Describe your issue or question...">
+                    </textarea>
+                </div>
+                <button type="submit" class="btn-primary btn-lg"
+                        style="align-self:flex-start;">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

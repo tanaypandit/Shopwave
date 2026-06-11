@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Checkout | ShopWave</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+	<style>
+		.slot-option input[type="radio"] {
+			display: none;
+		}
+
+		.slot-card {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: .4rem;
+			padding: 1.25rem 1rem;
+			border: 2px solid #e8e4df;
+			border-radius: 10px;
+			cursor: pointer;
+			transition: all .2s;
+			text-align: center;
+			background: #fff;
+		}
+
+		.slot-card i {
+			font-size: 1.5rem;
+			color: #e8521a;
+		}
+
+		.slot-card strong {
+			font-size: .95rem;
+			color: #1a1814;
+		}
+
+		.slot-card span {
+			font-size: .8rem;
+			color: #6b6560;
+		}
+
+		.slot-option input:checked+.slot-card {
+			border-color: #e8521a;
+			background: #fff0ea;
+		}
+
+		.slot-card:hover {
+			border-color: #e8521a;
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/layout :: navbar}"></div>
+	<div th:replace="~{fragments/layout :: flash}"></div>
+
+	<div class="container" style="padding-top:2rem; padding-bottom:3rem;">
+		<h1 class="page-title">Checkout</h1>
+
+		<div class="checkout-layout">
+			<div class="checkout-form-section">
+
+				<!-- IMPORTANT: now goes to payment page, NOT place-order -->
+				<form th:action="@{/checkout/payment}" method="post" id="checkoutForm">
+
+					<!-- Shipping Address -->
+					<div class="checkout-card">
+						<h3><i class="fas fa-map-marker-alt"></i> Shipping Address</h3>
+						<div class="form-grid">
+							<div class="form-group">
+								<label>Full Name</label>
+								<input type="text" name="shippingName" th:value="${user.fullName}" required />
+							</div>
+
+							<div class="form-group">
+								<label>Phone</label>
+								<input type="tel" name="shippingPhone" th:value="${user.phone}" required maxlength="10"
+									pattern="[0-9]{10}" placeholder="10-digit mobile number" />
+							</div>
+
+							<div class="form-group full-width">
+								<label>Address</label>
+								<input type="text" name="shippingAddress" required
+									placeholder="House No, Street, Area" />
+							</div>
+
+							<div class="form-group">
+								<label>City</label>
+								<input type="text" name="shippingCity" required placeholder="Enter City" />
+							</div>
+
+							<div class="form-group">
+								<label>State</label>
+								<input type="text" name="shippingState" required placeholder="Enter State" />
+							</div>
+
+							<div class="form-group">
+								<label>PIN Code</label>
+								<input type="text" name="shippingZip" required placeholder="Pincode" maxlength="6"
+									pattern="[0-9]{6}" />
+							</div>
+						</div>
+					</div>
+
+
+					<!-- Delivery Slot Selection -->
+					<div class="checkout-card" style="margin-top: 1.25rem;">
+						<h3><i class="fas fa-clock" style="color:#e8521a;"></i>
+							Choose Delivery Slot</h3>
+						<p style="color:#6b6560; font-size:.9rem; margin-bottom:1.25rem;">
+							Pick a time that works best for you —
+							we will make sure the delivery partner arrives in that window.
+						</p>
+						<div style="display:grid; grid-template-columns:1fr 1fr;
+				                gap:.75rem;">
+
+							<label class="slot-option">
+								<input type="radio" name="deliverySlot" value="Morning (9am - 12pm)" required />
+								<div class="slot-card">
+									<i class="fas fa-sun"></i>
+									<strong>Morning</strong>
+									<span>9:00 AM – 12:00 PM</span>
+								</div>
+							</label>
+
+							<label class="slot-option">
+								<input type="radio" name="deliverySlot" value="Afternoon (12pm - 4pm)" />
+								<div class="slot-card">
+									<i class="fas fa-cloud-sun"></i>
+									<strong>Afternoon</strong>
+									<span>12:00 PM – 4:00 PM</span>
+								</div>
+							</label>
+
+							<label class="slot-option">
+								<input type="radio" name="deliverySlot" value="Evening (4pm - 8pm)" />
+								<div class="slot-card">
+									<i class="fas fa-moon"></i>
+									<strong>Evening</strong>
+									<span>4:00 PM – 8:00 PM</span>
+								</div>
+							</label>
+
+							<label class="slot-option">
+								<input type="radio" name="deliverySlot" value="Weekend (Sat/Sun, 10am - 6pm)" />
+								<div class="slot-card">
+									<i class="fas fa-calendar-alt"></i>
+									<strong>Weekend</strong>
+									<span>Sat/Sun, 10:00 AM – 6:00 PM</span>
+								</div>
+							</label>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<!-- Order Review -->
+			<div class="checkout-summary">
+				<div class="checkout-card">
+					<h3>Order Review</h3>
+
+					<div class="checkout-items">
+						<div th:each="item : ${cartItems}" class="checkout-item">
+							<img th:src="${item.product.imageUrl}" th:alt="${item.product.name}"
+								onerror="this.src='https://via.placeholder.com/50x50'" />
+							<div>
+								<strong th:text="${item.product.name}">Name</strong>
+								<!-- ✅ Show size if selected -->
+								<span th:if="${item.selectedSize != null
+				                          and !#strings.isEmpty(item.selectedSize)}">
+									<br><strong>Size: <span th:text="${item.selectedSize}"></span>
+								</span>
+								<span th:text="'Qty: ' + ${item.quantity}"></span>
+							</div>
+							<span th:text="'₹' + ${#numbers.formatDecimal(
+				              item.subtotal, 1, 'COMMA', 0, 'POINT')}">₹0</span>
+						</div>
+					</div>
+
+					<div class="summary-row">
+						<span>Subtotal</span>
+						<strong th:text="'₹' + ${#numbers.formatDecimal(cartTotal, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+					</div>
+
+					<div class="summary-row">
+						<span>Shipping</span>
+						<strong>
+							<span th:if="${shippingCost.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+								class="free">FREE</span>
+							<span th:unless="${shippingCost.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+								th:text="'₹' + ${#numbers.formatDecimal(shippingCost, 1, 'COMMA', 0, 'POINT')}"></span>
+						</strong>
+					</div>
+
+					<div class="summary-row total">
+						<span>Total</span>
+						<strong
+							th:text="'₹' + ${#numbers.formatDecimal(grandTotal, 1, 'COMMA', 0, 'POINT')}">₹0</strong>
+					</div>
+
+					<button type="submit" form="checkoutForm" class="btn-primary btn-block btn-lg">
+						<i class="fas fa-arrow-right"></i> Continue to Payment
+					</button>
+
+					<p style="text-align:center; font-size:0.8rem; margin-top:1rem; color:#888;">
+						<i class="fas fa-shield-alt"></i> 100% Secure Checkout
+					</p>
+					<!-- ✅ Cancel Order option at checkout -->
+					<div style="margin-top:1.25rem; padding-top:1.25rem;
+				            border-top:1px dashed #e8e4df; text-align:center;">
+						<p style="font-size:.82rem; color:#6b6560; margin-bottom:.6rem;">
+							<i class="fas fa-info-circle"></i>
+							Changed your mind? You can cancel before placing the order.
+						</p>
+						<a th:href="@{/cart}" class="cancel-btn-checkout" style="display:inline-flex; align-items:center; gap:.4rem;
+					          background:#fff; color:#dc2626;
+					          border:1.5px solid #fecaca; border-radius:8px;
+					          padding:.5rem 1.25rem; font-size:.85rem;
+					          font-weight:600; text-decoration:none;">
+							<i class="fas fa-times-circle"></i> Cancel &amp; Return to Cart
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="~{fragments/layout :: footer}"></div>
+	<script th:src="@{/js/main.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="admin-nav" class="admin-nav">
+    <div class="admin-nav-brand">
+        <a href="/" class="logo">Shop<span>Wave</span></a>
+        <span class="admin-label">Admin</span>
+    </div>
+    <ul class="admin-nav-links">
+        <li>
+            <a th:href="@{/admin}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/products}">
+                <i class="fas fa-box"></i> Products
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/categories}">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/orders}">
+                <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+        </li>
+        <li style="margin-top:auto;">
+            <a th:href="@{/}">
+                <i class="fas fa-store"></i> View Store
+            </a>
+        </li>
+        <li>
+			<!-- ❌ WRONG -->
+			<a th:href="@{/logout}">
+			    <i class="fas fa-sign-out-alt"></i> Logout
+			</a>
+
+			<!-- ✅ CORRECT -->
+			
+        </li>
+    </ul>
+</nav>
+</body>
+</html>
